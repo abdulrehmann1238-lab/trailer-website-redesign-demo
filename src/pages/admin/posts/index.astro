@@ -1,0 +1,201 @@
+---
+// src/pages/admin/posts/index.astro
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { INITIAL_ARTICLES } from '../../../data/articles';
+---
+
+<AdminLayout title="Journal & Blog Management" activeNav="posts">
+  <div class="posts-admin-wrapper">
+    <div class="admin-view-header">
+      <div>
+        <h2 class="view-title">Hauling Journal Articles</h2>
+        <p class="view-sub">Publish educational technical guides, customer tips, and weight rating articles.</p>
+      </div>
+      <a href="/admin/posts/new" class="btn btn-primary">
+        + WRITE NEW ARTICLE
+      </a>
+    </div>
+
+    <!-- Posts Table -->
+    <div class="admin-table-card editorial-card">
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>COVER</th>
+              <th>ARTICLE TITLE</th>
+              <th>CATEGORY</th>
+              <th>AUTHOR</th>
+              <th>READING TIME</th>
+              <th>PUBLISHED</th>
+              <th style="text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="posts-table-tbody">
+            {INITIAL_ARTICLES.map((article) => (
+              <tr data-art-id={article.id}>
+                <td>
+                  <img src={article.coverImage} alt={article.title} class="table-thumb" />
+                </td>
+                <td>
+                  <a href={`/blog/${article.slug}`} target="_blank" class="table-title-link">
+                    {article.title}
+                  </a>
+                </td>
+                <td><span class="badge badge-category">{article.category}</span></td>
+                <td><span class="mono-tag">{article.author.name}</span></td>
+                <td><span class="mono-tag">{article.readingTime}</span></td>
+                <td><span class="mono-tag">{article.publishedAt}</span></td>
+                <td style="text-align: right;">
+                  <div class="row-actions-group">
+                    <a href={`/blog/${article.slug}`} target="_blank" class="btn-action edit" title="Preview Article">
+                      View
+                    </a>
+                    <button class="btn-action delete delete-post-btn" data-id={article.id} title="Delete Article">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<style>
+  .posts-admin-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .admin-view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .view-title {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .view-sub {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .admin-table-card {
+    background-color: #FFFFFF;
+    padding: 0.5rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .admin-table th, .admin-table td {
+    padding: 0.95rem 0.85rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .table-thumb {
+    width: 54px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: var(--radius-xs);
+    background-color: var(--color-pale-sand);
+  }
+
+  .table-title-link {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+  }
+
+  .table-title-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  .row-actions-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .btn-action {
+    background: transparent;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-xs);
+    padding: 0.25rem 0.55rem;
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .btn-action.edit { color: var(--color-forest-green); }
+  .btn-action.edit:hover { background-color: var(--color-forest-green); color: var(--color-pure-white); }
+  .btn-action.delete { color: #A82424; }
+  .btn-action.delete:hover { background-color: #A82424; color: var(--color-pure-white); }
+</style>
+
+<script>
+  import { loadDemoState, saveDemoState } from '../../../utils/demo-state';
+
+  const tbody = document.getElementById('posts-table-tbody');
+
+  function renderPosts() {
+    const state = loadDemoState();
+    if (!tbody) return;
+
+    tbody.innerHTML = state.articles.map((a) => `
+      <tr data-art-id="${a.id}">
+        <td>
+          <img src="${a.coverImage}" alt="${a.title}" class="table-thumb" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=100&q=80'" />
+        </td>
+        <td>
+          <a href="/blog/${a.slug}" target="_blank" class="table-title-link">${a.title}</a>
+        </td>
+        <td><span class="badge badge-category">${a.category}</span></td>
+        <td><span class="mono-tag">${a.author.name}</span></td>
+        <td><span class="mono-tag">${a.readingTime}</span></td>
+        <td><span class="mono-tag">${a.publishedAt}</span></td>
+        <td style="text-align: right;">
+          <div class="row-actions-group">
+            <a href="/blog/${a.slug}" target="_blank" class="btn-action edit" title="Preview Article">View</a>
+            <button class="btn-action delete delete-post-btn" data-id="${a.id}" title="Delete Article">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    tbody.querySelectorAll('.delete-post-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.id;
+        if (!id) return;
+        if (confirm('Delete this article from the journal?')) {
+          state.articles = state.articles.filter((item) => item.id !== id);
+          saveDemoState(state);
+          renderPosts();
+        }
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', renderPosts);
+</script>

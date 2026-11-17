@@ -1,0 +1,10 @@
+name = "trailer-commerce"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+[env.production]
+vars = { ENVIRONMENT = "production", SITE_URL = "https://trailercommerce.demo" }
+
+[env.preview]
+vars = { ENVIRONMENT = "preview", SITE_URL = "https://preview.trailercommerce.demo" }

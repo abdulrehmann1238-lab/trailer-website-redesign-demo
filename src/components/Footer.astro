@@ -1,0 +1,473 @@
+---
+// Footer.astro
+---
+<footer class="site-footer">
+  <!-- Top Accent Bar -->
+  <div class="footer-accent-bar"></div>
+
+  <div class="container-wide footer-content">
+    <div class="footer-grid">
+      <!-- Col 1: Brand & Philosophy -->
+      <div class="footer-brand-col">
+        <a href="/" class="footer-logo">
+          <div class="logo-mark">
+            <svg viewBox="0 0 48 48" fill="none" class="logo-svg" aria-hidden="true">
+              <rect width="48" height="48" rx="8" fill="#F5F3ED"/>
+              <path d="M12 28L18 16H36L30 28H12Z" fill="#26372F"/>
+              <circle cx="19" cy="33" r="3.5" fill="#A66E4D"/>
+              <circle cx="29" cy="33" r="3.5" fill="#A66E4D"/>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span class="logo-brand">TRAILER COMMERCE</span>
+            <span class="logo-tag">BUILT FOR THE JOURNEY</span>
+          </div>
+        </a>
+        <p class="footer-bio">
+          Curated commercial and outdoor utility trailers engineered for dependable payload performance, road safety, and enduring usability.
+        </p>
+
+        <!-- CMS Demo Callout Badge -->
+        <div class="admin-demo-box">
+          <span class="admin-demo-eyebrow">CLIENT DEMONSTRATION</span>
+          <p class="admin-demo-text">Explore the live Payload CMS administration interface to manage inventory and content in real-time.</p>
+          <a href="/admin/login" class="btn-admin-demo">
+            CONTENT MANAGEMENT DEMO &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Col 2: Categories -->
+      <div class="footer-nav-col">
+        <h4 class="footer-heading">TRAILER MODELS</h4>
+        <ul class="footer-links">
+          <li><a href="/trailers/enclosed-trailers">Enclosed Cargo Trailers</a></li>
+          <li><a href="/trailers/utility-trailers">Open Utility & Landscaping</a></li>
+          <li><a href="/trailers/flatbed-trailers">Heavy-Duty Flatbeds & Decks</a></li>
+          <li><a href="/trailers/cargo-trailers">High-Cube Cargo Trailers</a></li>
+          <li><a href="/trailers/horse-trailers">Equestrian & Horse Trailers</a></li>
+          <li><a href="/trailers" class="link-highlight">View Complete Catalogue &rarr;</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Company & Handover -->
+      <div class="footer-nav-col">
+        <h4 class="footer-heading">COMPANY & TECH</h4>
+        <ul class="footer-links">
+          <li><a href="/about">About Trailer Commerce</a></li>
+          <li><a href="/blog">Hauling Journal & Guides</a></li>
+          <li><a href="/contact">Direct Consultation</a></li>
+          <li><a href="/handover" class="handover-highlight">Handover Documentation</a></li>
+          <li><a href="/admin/login">Admin Dashboard Login</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Newsletter & Contact -->
+      <div class="footer-contact-col">
+        <h4 class="footer-heading">CONNECT & UPDATES</h4>
+        <p class="newsletter-desc">Receive occasional engineering releases and inventory updates. No spam.</p>
+
+        <form id="footer-newsletter-form" class="newsletter-form" novalidate>
+          <div class="newsletter-input-group">
+            <input
+              type="email"
+              id="newsletter-email-input"
+              class="newsletter-input"
+              placeholder="Your email address"
+              required
+              aria-label="Email address for updates"
+            />
+            <button type="submit" class="newsletter-submit" aria-label="Subscribe to newsletter">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+          <div id="newsletter-status" class="newsletter-status"></div>
+        </form>
+
+        <div class="footer-details">
+          <div class="detail-item">
+            <span class="detail-label">SPECIALIST ADVICE:</span>
+            <span class="detail-val">(555) 234-5678</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">ENQUIRIES:</span>
+            <span class="detail-val">specialists@trailercommerce.demo</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">HOURS:</span>
+            <span class="detail-val">Mon–Fri: 8am – 5:30pm</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+      <div class="copyright-info">
+        <p>&copy; {new Date().getFullYear()} TRAILER COMMERCE. All rights reserved. Built as an interactive e-commerce demonstration.</p>
+      </div>
+
+      <div class="legal-links">
+        <a href="#privacy" id="footer-privacy-link">Privacy Policy</a>
+        <a href="#terms" id="footer-terms-link">Terms & Conditions</a>
+        <a href="/handover">Architecture Handover</a>
+        <button id="back-to-top" class="back-to-top" aria-label="Scroll back to top of page">
+          BACK TO TOP
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background-color: var(--color-deep-charcoal);
+    color: var(--color-warm-ivory);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .footer-accent-bar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-forest-green) 0%, var(--color-muted-copper) 100%);
+  }
+
+  .footer-content {
+    padding-top: clamp(3.5rem, 6vw, 5rem);
+    padding-bottom: 2.5rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    margin-bottom: 3.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+      gap: 3.5rem;
+    }
+  }
+
+  /* Col 1 Brand */
+  .footer-brand-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+  }
+
+  .footer-logo .logo-brand {
+    color: var(--color-warm-ivory);
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: 0.08em;
+  }
+
+  .footer-logo .logo-tag {
+    color: var(--color-muted-copper);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+  }
+
+  .footer-bio {
+    color: #A3A69F;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    max-width: 380px;
+  }
+
+  .admin-demo-box {
+    margin-top: 0.75rem;
+    padding: 1rem 1.15rem;
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(166, 110, 77, 0.4);
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .admin-demo-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--color-muted-copper);
+    text-transform: uppercase;
+  }
+
+  .admin-demo-text {
+    font-size: 0.8rem;
+    color: #C7C9C4;
+    line-height: 1.4;
+  }
+
+  .btn-admin-demo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #F5F3ED;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .btn-admin-demo:hover {
+    color: var(--color-muted-copper);
+  }
+
+  /* Nav Cols */
+  .footer-heading {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--color-soft-stone);
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .footer-links a {
+    color: #B5B7B1;
+    font-size: 0.9rem;
+    transition: color var(--transition-fast), transform var(--transition-fast);
+    display: inline-block;
+  }
+
+  .footer-links a:hover {
+    color: var(--color-warm-ivory);
+    transform: translateX(3px);
+  }
+
+  .link-highlight {
+    color: var(--color-muted-copper) !important;
+    font-weight: 600;
+  }
+
+  .handover-highlight {
+    color: #48BB78 !important;
+    font-weight: 600;
+  }
+
+  /* Newsletter Col */
+  .newsletter-desc {
+    font-size: 0.88rem;
+    color: #A3A69F;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .newsletter-input-group {
+    display: flex;
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+
+  .newsletter-input {
+    width: 100%;
+    padding: 0.75rem 2.8rem 0.75rem 1rem;
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: var(--radius-sm);
+    color: var(--color-pure-white);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .newsletter-input:focus {
+    border-color: var(--color-muted-copper);
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .newsletter-submit {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+    width: 36px;
+    background-color: var(--color-forest-green);
+    border: none;
+    border-radius: var(--radius-xs);
+    color: var(--color-pure-white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition-fast);
+  }
+
+  .newsletter-submit:hover {
+    background-color: var(--color-forest-green-light);
+  }
+
+  .newsletter-status {
+    font-size: 0.8rem;
+    min-height: 1.2rem;
+  }
+
+  .newsletter-status.is-success {
+    color: #48BB78;
+  }
+
+  .newsletter-status.is-error {
+    color: #F56565;
+  }
+
+  .footer-details {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+  }
+
+  .detail-item {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .detail-label {
+    font-family: var(--font-mono);
+    color: var(--color-muted-copper);
+    font-size: 0.72rem;
+  }
+
+  .detail-val {
+    color: #D6D0C3;
+  }
+
+  /* Bottom Bar */
+  .footer-bottom {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  @media (min-width: 768px) {
+    .footer-bottom {
+      flex-direction: row;
+    }
+  }
+
+  .copyright-info p {
+    font-size: 0.82rem;
+    color: #7E807D;
+  }
+
+  .legal-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .legal-links a {
+    font-size: 0.82rem;
+    color: #A3A69F;
+  }
+
+  .legal-links a:hover {
+    color: var(--color-warm-ivory);
+  }
+
+  .back-to-top {
+    background: transparent;
+    border: none;
+    color: var(--color-muted-copper);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color var(--transition-fast);
+  }
+
+  .back-to-top:hover {
+    color: var(--color-pure-white);
+  }
+</style>
+
+<script>
+  // Newsletter Form Handler
+  const form = document.getElementById('footer-newsletter-form');
+  const input = document.getElementById('newsletter-email-input') as HTMLInputElement;
+  const status = document.getElementById('newsletter-status');
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!input || !status) return;
+
+    const email = input.value.trim();
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      status.className = 'newsletter-status is-error';
+      status.textContent = 'Please provide a valid email address.';
+      return;
+    }
+
+    // Success simulation
+    status.className = 'newsletter-status is-success';
+    status.textContent = 'Subscribed successfully. Thank you!';
+    input.value = '';
+    setTimeout(() => {
+      if (status) status.textContent = '';
+    }, 4500);
+  });
+
+  // Back to Top Action
+  document.getElementById('back-to-top')?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Modal alert for privacy/terms demonstration
+  document.getElementById('footer-privacy-link')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('TRAILER COMMERCE Demo: All data is stored purely locally in your browser (localStorage). No tracking cookies or third-party analytical pixels are active.');
+  });
+
+  document.getElementById('footer-terms-link')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('TRAILER COMMERCE Demo: This website is a demonstration prototype designed for client Serkan. All prices, specifications, and inventory counts are illustrative.');
+  });
+</script>

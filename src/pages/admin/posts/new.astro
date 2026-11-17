@@ -1,0 +1,380 @@
+---
+// src/pages/admin/posts/new.astro
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Compose Journal Article" activeNav="posts">
+  <form id="post-editor-form" class="post-editor-form">
+    <!-- Header Actions -->
+    <div class="editor-header-sticky">
+      <div>
+        <a href="/admin/posts" class="back-link">&larr; All Articles</a>
+        <h2 class="editor-page-title">Write New Hauling Guide</h2>
+      </div>
+
+      <div class="header-actions">
+        <a href="/admin/posts" class="btn btn-secondary btn-sm">Cancel</a>
+        <button type="button" id="btn-save-draft" class="btn btn-secondary btn-sm">Save Draft</button>
+        <button type="submit" id="btn-publish-post" class="btn btn-primary btn-sm">Publish Article</button>
+      </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="post-success-toast" class="editor-success-toast" style="display: none;">
+      <div>
+        <strong>Article Published Successfully!</strong>
+        <p class="toast-sub">The article is now indexed in the Hauling Journal and available on the storefront.</p>
+      </div>
+      <a id="post-view-link" href="/blog" target="_blank" class="btn btn-primary btn-sm">
+        View Live Article &rarr;
+      </a>
+    </div>
+
+    <div class="editor-columns-grid">
+      <!-- Main Content Column -->
+      <div class="editor-main-col">
+        <div class="editor-section-card editorial-card">
+          <div class="form-group">
+            <label for="post-title" class="form-label">Article Title *</label>
+            <input
+              type="text"
+              id="post-title"
+              class="form-input"
+              placeholder="e.g. 5 Warning Signs Your Trailer Suspension Needs Inspection"
+              required
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="post-slug" class="form-label">URL Slug *</label>
+              <input
+                type="text"
+                id="post-slug"
+                class="form-input font-mono"
+                placeholder="warning-signs-trailer-suspension"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="post-category" class="form-label">Category</label>
+              <select id="post-category" class="form-select">
+                <option value="Buying Guides">Buying Guides</option>
+                <option value="Technical Specifications">Technical Specifications</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Towing Safety">Towing Safety</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="post-excerpt" class="form-label">Excerpt / Subtitle *</label>
+            <textarea
+              id="post-excerpt"
+              rows="2"
+              class="form-textarea"
+              placeholder="Concise 1-2 sentence overview shown on blog index cards and social previews..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="post-image" class="form-label">Featured Cover Image URL</label>
+            <input
+              type="url"
+              id="post-image"
+              class="form-input font-mono"
+              value="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1400&q=80"
+              required
+            />
+          </div>
+
+          <!-- Rich Text Formatting Bar -->
+          <div class="rich-editor-wrapper">
+            <label class="form-label">Article Body Content *</label>
+            <div class="rich-toolbar">
+              <button type="button" class="tool-btn" data-tag="bold" title="Bold"><strong>B</strong></button>
+              <button type="button" class="tool-btn" data-tag="italic" title="Italic"><em>I</em></button>
+              <button type="button" class="tool-btn" data-tag="h2" title="H2 Heading">H2</button>
+              <button type="button" class="tool-btn" data-tag="h3" title="H3 Heading">H3</button>
+              <button type="button" class="tool-btn" data-tag="ul" title="Bulleted List">&bull; List</button>
+              <button type="button" class="tool-btn" data-tag="ol" title="Numbered List">1. List</button>
+              <button type="button" class="tool-btn" data-tag="link" title="Insert Link">&#128279; Link</button>
+            </div>
+            <textarea
+              id="post-content"
+              rows="12"
+              class="form-textarea rich-textarea font-mono"
+              placeholder="<p class='lead'>Opening thesis or introduction...</p>&#10;&#10;<h2>1. The First Factor</h2>&#10;<p>Detailed technical analysis and recommendations...</p>"
+              required
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Sidebar Column: SEO & Meta -->
+      <div class="editor-side-col">
+        <div class="side-panel editorial-card">
+          <h4 class="side-panel-title">PUBLICATION METADATA</h4>
+          <div class="form-group">
+            <label for="post-author" class="form-label">Author Name</label>
+            <input type="text" id="post-author" class="form-input" value="Marcus Vance" />
+          </div>
+
+          <div class="form-group">
+            <label for="post-date" class="form-label">Publish Date</label>
+            <input type="date" id="post-date" class="form-input font-mono" value={new Date().toISOString().split('T')[0]} />
+          </div>
+
+          <div class="form-group">
+            <label for="post-reading-time" class="form-label">Estimated Read Time</label>
+            <input type="text" id="post-reading-time" class="form-input" value="5 min read" />
+          </div>
+        </div>
+
+        <div class="side-panel editorial-card">
+          <h4 class="side-panel-title">SEO SETTINGS</h4>
+          <div class="form-group">
+            <label for="post-seo-title" class="form-label">SEO Meta Title</label>
+            <input type="text" id="post-seo-title" class="form-input" placeholder="Meta title..." />
+          </div>
+
+          <div class="form-group">
+            <label for="post-seo-desc" class="form-label">Meta Description</label>
+            <textarea id="post-seo-desc" rows="3" class="form-textarea" placeholder="Google SERP snippet description..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</AdminLayout>
+
+<style>
+  .post-editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .editor-header-sticky {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-medium);
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .editor-page-title {
+    font-size: 1.45rem;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.65rem;
+  }
+
+  .editor-success-toast {
+    background-color: #E8F2EC;
+    border: 1px solid #1F6B42;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .toast-sub {
+    font-size: 0.82rem;
+    color: var(--color-deep-charcoal);
+    margin: 0.15rem 0 0 0;
+  }
+
+  .editor-columns-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .editor-columns-grid {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  .editor-main-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .editor-section-card {
+    background-color: #FFFFFF;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .rich-editor-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .rich-toolbar {
+    display: flex;
+    gap: 0.35rem;
+    background-color: var(--color-pale-sand);
+    padding: 0.4rem;
+    border: 1px solid var(--border-medium);
+    border-bottom: none;
+    border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+  }
+
+  .tool-btn {
+    background-color: #FFFFFF;
+    border: 1px solid var(--border-light);
+    border-radius: 2px;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .tool-btn:hover {
+    background-color: var(--color-forest-green);
+    color: #FFFFFF;
+  }
+
+  .rich-textarea {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .editor-side-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .side-panel {
+    background-color: #FFFFFF;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .side-panel-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0;
+  }
+</style>
+
+<script>
+  import { loadDemoState, saveDemoState, type Article } from '../../../utils/demo-state';
+
+  const form = document.getElementById('post-editor-form') as HTMLFormElement;
+  const titleInput = document.getElementById('post-title') as HTMLInputElement;
+  const slugInput = document.getElementById('post-slug') as HTMLInputElement;
+  const catSelect = document.getElementById('post-category') as HTMLSelectElement;
+  const excerptInput = document.getElementById('post-excerpt') as HTMLTextAreaElement;
+  const imgInput = document.getElementById('post-image') as HTMLInputElement;
+  const contentInput = document.getElementById('post-content') as HTMLTextAreaElement;
+  const authorInput = document.getElementById('post-author') as HTMLInputElement;
+  const dateInput = document.getElementById('post-date') as HTMLInputElement;
+  const readingInput = document.getElementById('post-reading-time') as HTMLInputElement;
+  const toast = document.getElementById('post-success-toast');
+  const viewLink = document.getElementById('post-view-link') as HTMLAnchorElement;
+
+  // Auto-slug
+  titleInput?.addEventListener('input', () => {
+    slugInput.value = titleInput.value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  });
+
+  // Rich Text helper buttons
+  document.querySelectorAll('.tool-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tag = (btn as HTMLElement).dataset.tag;
+      if (!contentInput) return;
+      const start = contentInput.selectionStart;
+      const end = contentInput.selectionEnd;
+      const text = contentInput.value;
+      const selected = text.substring(start, end) || 'text';
+
+      let replacement = selected;
+      if (tag === 'bold') replacement = `<strong>${selected}</strong>`;
+      if (tag === 'italic') replacement = `<em>${selected}</em>`;
+      if (tag === 'h2') replacement = `<h2>${selected}</h2>`;
+      if (tag === 'h3') replacement = `<h3>${selected}</h3>`;
+      if (tag === 'ul') replacement = `<ul>\n  <li>${selected}</li>\n</ul>`;
+      if (tag === 'ol') replacement = `<ol>\n  <li>${selected}</li>\n</ol>`;
+      if (tag === 'link') replacement = `<a href="#">${selected}</a>`;
+
+      contentInput.value = text.substring(0, start) + replacement + text.substring(end);
+      contentInput.focus();
+    });
+  });
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const state = loadDemoState();
+    const slug = slugInput.value.trim();
+
+    const newArticle: Article = {
+      id: `post-${Date.now()}`,
+      title: titleInput.value.trim(),
+      slug: slug,
+      category: catSelect.value,
+      excerpt: excerptInput.value.trim(),
+      coverImage: imgInput.value.trim(),
+      content: contentInput.value.trim(),
+      author: {
+        name: authorInput.value.trim() || 'Marcus Vance',
+        role: 'Fleet Engineering Lead',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80'
+      },
+      publishedAt: dateInput.value || new Date().toISOString().split('T')[0],
+      readingTime: readingInput.value.trim() || '5 min read',
+      tags: ['Technical Guide', catSelect.value],
+      tableOfContents: [
+        { id: 'section-1', title: '1. Overview and Engineering Considerations' },
+        { id: 'section-2', title: '2. Field Inspection Protocols' }
+      ],
+      seoTitle: `${titleInput.value.trim()} | Trailer Commerce`,
+      seoDescription: excerptInput.value.trim()
+    };
+
+    state.articles.unshift(newArticle);
+    saveDemoState(state);
+
+    if (toast) toast.style.display = 'flex';
+    if (viewLink) viewLink.href = `/blog/${slug}`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>

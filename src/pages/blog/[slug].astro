@@ -1,0 +1,538 @@
+---
+// src/pages/blog/[slug].astro
+import MainLayout from '../../layouts/MainLayout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { INITIAL_ARTICLES, type Article } from '../../data/articles';
+import { getArticleSchema, getBreadcrumbSchema } from '../../utils/schema';
+
+export function getStaticPaths() {
+  return INITIAL_ARTICLES.map((article) => ({
+    params: { slug: article.slug },
+    props: { article }
+  }));
+}
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+
+// Related articles
+const relatedArticles = INITIAL_ARTICLES.filter((a) => a.id !== article.id).slice(0, 2);
+
+const breadcrumbs = [
+  { name: 'Home', url: '/' },
+  { name: 'Journal', url: '/blog' },
+  { name: article.title, url: `/blog/${article.slug}` }
+];
+
+const articleSchema = getArticleSchema(article);
+const breadcrumbSchema = getBreadcrumbSchema(breadcrumbs);
+---
+
+<MainLayout
+  title={article.seoTitle}
+  description={article.seoDescription}
+  canonical={`/blog/${article.slug}`}
+  image={article.coverImage}
+  type="article"
+  publishedTime={`${article.publishedAt}T08:00:00+00:00`}
+  author={article.author.name}
+  jsonLdSchema={[articleSchema, breadcrumbSchema]}
+>
+  <article class="article-page-wrapper">
+    <!-- Top Breadcrumbs -->
+    <div class="container article-breadcrumb-container">
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-separator">/</li>
+          <li class="breadcrumb-item"><a href="/blog">Journal</a></li>
+          <li class="breadcrumb-separator">/</li>
+          <li class="breadcrumb-item is-current" aria-current="page">{article.category}</li>
+        </ol>
+      </nav>
+    </div>
+
+    <!-- Article Header -->
+    <header class="container article-header">
+      <div class="article-meta-top">
+        <span class="badge badge-category">{article.category}</span>
+        <span class="article-date">{article.publishedAt}</span>
+        <span class="article-dot">•</span>
+        <span class="article-reading-time">{article.readingTime}</span>
+      </div>
+
+      <h1 class="article-headline">{article.title}</h1>
+      <p class="article-deck">{article.excerpt}</p>
+
+      <div class="article-author-strip">
+        <div class="author-block">
+          <img src={article.author.avatar} alt={article.author.name} class="author-pic" />
+          <div>
+            <span class="author-full-name">{article.author.name}</span>
+            <span class="author-title-sub">{article.author.role}</span>
+          </div>
+        </div>
+
+        <div class="article-share-actions">
+          <button id="copy-article-link-btn" class="btn-share" title="Copy article link to clipboard">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            <span id="copy-btn-text">SHARE ARTICLE</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Image Banner -->
+    <div class="container article-hero-img-wrap">
+      <div class="article-cover-frame">
+        <img
+          src={article.coverImage}
+          alt={article.title}
+          class="article-cover-img"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+
+    <!-- Content Layout: Sticky Table of Contents + Rich Prose -->
+    <div class="container article-body-container">
+      <div class="article-layout-grid">
+        <!-- Table of Contents Sidebar -->
+        <aside class="article-toc-sidebar" aria-label="Table of contents">
+          <div class="toc-sticky-box">
+            <span class="toc-title">TABLE OF CONTENTS</span>
+            <nav class="toc-nav">
+              <ul class="toc-list">
+                {article.tableOfContents.map((tocItem) => (
+                  <li>
+                    <a href={`#${tocItem.id}`} class="toc-link">
+                      {tocItem.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div class="toc-help-box">
+              <span class="help-box-title">NEED SPECIALIST INPUT?</span>
+              <p class="help-box-desc">Speak directly with our team regarding payload calculations.</p>
+              <button id="toc-enquiry-btn" class="btn btn-secondary btn-sm btn-block">
+                ASK A SPECIALIST
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Prose Column -->
+        <div class="article-prose-col">
+          <div class="article-rich-content" set:html={article.content} />
+
+          <!-- Tags -->
+          <div class="article-tags-wrap">
+            <span class="tags-label">TOPICS:</span>
+            <div class="tags-list">
+              {article.tags.map((tag) => (
+                <span class="tag-badge">#{tag}</span>
+              ))}
+            </div>
+          </div>
+
+          <!-- Bottom Article Callout -->
+          <div class="article-cta-box">
+            <span class="eyebrow eyebrow-forest">TRAILER COMMERCE CATALOGUE</span>
+            <h3 class="cta-box-title">Explore Commercial Trailers Vetted for the Long Haul</h3>
+            <p class="cta-box-desc">
+              Whether you need enclosed security or open utility agility, review our verified inventory with transparent demo pricing.
+            </p>
+            <div class="cta-box-actions">
+              <a href="/trailers" class="btn btn-primary">
+                VIEW ALL TRAILER MODELS
+              </a>
+              <a href="/contact" class="btn btn-secondary">
+                TALK TO OUR TEAM
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Articles -->
+    <section class="section article-related-section">
+      <div class="container">
+        <div class="section-head-split">
+          <div>
+            <span class="eyebrow eyebrow-forest">FURTHER READING</span>
+            <h2 class="section-heading">Related Technical Guides</h2>
+          </div>
+          <a href="/blog" class="btn btn-secondary btn-sm">
+            ALL JOURNAL ARTICLES &rarr;
+          </a>
+        </div>
+
+        <div class="related-articles-grid">
+          {relatedArticles.map((rel) => (
+            <BlogCard article={rel} />
+          ))}
+        </div>
+      </div>
+    </section>
+  </article>
+</MainLayout>
+
+<style>
+  .article-page-wrapper {
+    padding-bottom: 5rem;
+  }
+
+  .article-breadcrumb-container {
+    padding-top: 1.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .article-header {
+    max-width: 900px;
+    margin: 1.5rem auto 2rem auto;
+  }
+
+  .article-meta-top {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .article-headline {
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    line-height: 1.15;
+    margin-bottom: 1.25rem;
+  }
+
+  .article-deck {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+
+  .article-author-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .author-block {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .author-pic {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .author-full-name {
+    display: block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-deep-charcoal);
+  }
+
+  .author-title-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .btn-share {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.85rem;
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .btn-share:hover {
+    border-color: var(--color-forest-green);
+    color: var(--color-forest-green);
+  }
+
+  /* Cover Image */
+  .article-hero-img-wrap {
+    margin-bottom: 3.5rem;
+  }
+
+  .article-cover-frame {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    aspect-ratio: 21 / 9;
+    box-shadow: var(--shadow-card);
+  }
+
+  .article-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Layout Grid */
+  .article-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+  }
+
+  @media (min-width: 992px) {
+    .article-layout-grid {
+      grid-template-columns: 280px 1fr;
+    }
+  }
+
+  /* TOC Sidebar */
+  .toc-sticky-box {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .toc-title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .toc-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .toc-link {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    transition: color var(--transition-fast);
+  }
+
+  .toc-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  .toc-help-box {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .help-box-title {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .help-box-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.85rem;
+    line-height: 1.4;
+  }
+
+  /* Rich Content */
+  .article-prose-col {
+    max-width: 780px;
+  }
+
+  :global(.article-rich-content h2) {
+    font-size: 1.75rem;
+    margin: 2.25rem 0 1rem 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  :global(.article-rich-content p) {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+    color: #373A35;
+  }
+
+  :global(.article-rich-content p.lead) {
+    font-size: 1.25rem;
+    line-height: 1.65;
+    color: var(--color-deep-charcoal);
+    font-weight: 500;
+    margin-bottom: 2rem;
+  }
+
+  :global(.article-rich-content ul), :global(.article-rich-content ol) {
+    margin: 1rem 0 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  :global(.article-rich-content li) {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #373A35;
+  }
+
+  :global(.article-rich-content blockquote) {
+    border-left: 4px solid var(--color-forest-green);
+    background-color: var(--color-pale-sand);
+    padding: 1.25rem 1.5rem;
+    margin: 1.75rem 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+
+  :global(.article-rich-content blockquote p) {
+    margin: 0;
+    color: var(--color-deep-charcoal);
+  }
+
+  .article-tags-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+    margin: 3rem 0;
+    flex-wrap: wrap;
+  }
+
+  .tags-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .tags-list {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tag-badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    background-color: var(--color-pale-sand);
+    border-radius: var(--radius-xs);
+    color: var(--color-deep-charcoal);
+  }
+
+  .article-cta-box {
+    background-color: var(--color-pale-sand);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 2.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .cta-box-title {
+    font-size: 1.45rem;
+    margin: 0;
+  }
+
+  .cta-box-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .cta-box-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* Related */
+  .article-related-section {
+    background-color: var(--color-pale-sand);
+    border-top: 1px solid var(--border-medium);
+    margin-top: 5rem;
+  }
+
+  .related-articles-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .related-articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+
+<script>
+  // Copy Link Action
+  const shareBtn = document.getElementById('copy-article-link-btn');
+  const shareText = document.getElementById('copy-btn-text');
+
+  shareBtn?.addEventListener('click', () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        if (shareText) shareText.textContent = 'LINK COPIED!';
+        setTimeout(() => {
+          if (shareText) shareText.textContent = 'SHARE ARTICLE';
+        }, 3000);
+      });
+    } else {
+      alert('Article URL: ' + window.location.href);
+    }
+  });
+
+  // TOC Specialist Enquiry
+  document.getElementById('toc-enquiry-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-enquiry-modal', { detail: { product: '' } }));
+  });
+</script>

@@ -1,0 +1,332 @@
+---
+// src/pages/admin/pages.astro
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { INITIAL_SITE_CONTENT } from '../../data/site-content';
+
+const content = INITIAL_SITE_CONTENT;
+---
+
+<AdminLayout title="Website Pages & Copy" activeNav="pages">
+  <form id="pages-editor-form" class="pages-form-wrapper">
+    <div class="admin-view-header">
+      <div>
+        <h2 class="view-title">Static Content & Page Copy</h2>
+        <p class="view-sub">Edit prominent storefront marketing copy, headlines, and call-to-action labels in real time.</p>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        SAVE ALL PAGE CHANGES
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div id="pages-success-toast" class="editor-success-toast" style="display: none;">
+      <div>
+        <strong>Page Content Updated!</strong>
+        <p class="toast-sub">All revised headlines and descriptions have been saved and applied to the storefront.</p>
+      </div>
+      <a href="/" target="_blank" class="btn btn-primary btn-sm">
+        View Live Storefront &rarr;
+      </a>
+    </div>
+
+    <!-- Section: Homepage Copy -->
+    <section class="page-edit-card editorial-card">
+      <div class="page-card-header">
+        <span class="eyebrow eyebrow-forest">STOREFRONT HOMEPAGE</span>
+        <h3 class="page-card-title">Homepage Hero & Editorial Copy</h3>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="home-eyebrow" class="form-label">Hero Eyebrow Label</label>
+          <input
+            type="text"
+            id="home-eyebrow"
+            class="form-input"
+            value={content.homepage.heroEyebrow}
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="home-cta-pri" class="form-label">Primary Hero Button Text</label>
+          <input
+            type="text"
+            id="home-cta-pri"
+            class="form-input"
+            value={content.homepage.primaryCtaText}
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="home-headline" class="form-label">Main Hero Headline *</label>
+        <input
+          type="text"
+          id="home-headline"
+          class="form-input"
+          value={content.homepage.heroHeadline}
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="home-desc" class="form-label">Hero Description Subtitle *</label>
+        <textarea
+          id="home-desc"
+          rows="3"
+          class="form-textarea"
+          required
+        >{content.homepage.heroDescription}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="home-edit-head" class="form-label">Editorial Section Headline</label>
+        <input
+          type="text"
+          id="home-edit-head"
+          class="form-input"
+          value={content.homepage.editorialHeadline}
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="home-edit-para" class="form-label">Editorial Section Paragraph</label>
+        <textarea
+          id="home-edit-para"
+          rows="4"
+          class="form-textarea"
+        >{content.homepage.editorialParagraph}</textarea>
+      </div>
+    </section>
+
+    <!-- Section: About Page Copy -->
+    <section class="page-edit-card editorial-card">
+      <div class="page-card-header">
+        <span class="eyebrow eyebrow-forest">COMPANY OVERVIEW</span>
+        <h3 class="page-card-title">About Page Messaging</h3>
+      </div>
+
+      <div class="form-group">
+        <label for="about-headline" class="form-label">About Page Headline</label>
+        <input
+          type="text"
+          id="about-headline"
+          class="form-input"
+          value={content.about.heroHeadline}
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="about-intro" class="form-label">About Page Introduction Paragraph</label>
+        <textarea
+          id="about-intro"
+          rows="4"
+          class="form-textarea"
+        >{content.about.introParagraph}</textarea>
+      </div>
+    </section>
+
+    <!-- Section: Contact Page Copy -->
+    <section class="page-edit-card editorial-card">
+      <div class="page-card-header">
+        <span class="eyebrow eyebrow-forest">CUSTOMER SERVICE</span>
+        <h3 class="page-card-title">Contact Page Information</h3>
+      </div>
+
+      <div class="form-group">
+        <label for="contact-headline" class="form-label">Contact Headline</label>
+        <input
+          type="text"
+          id="contact-headline"
+          class="form-input"
+          value={content.contact.heroHeadline}
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="contact-intro" class="form-label">Contact Subtitle Text</label>
+        <textarea
+          id="contact-intro"
+          rows="3"
+          class="form-textarea"
+        >{content.contact.introText}</textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contact-phone" class="form-label">Phone Placeholder</label>
+          <input
+            type="text"
+            id="contact-phone"
+            class="form-input font-mono"
+            value={content.contact.phone}
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contact-email" class="form-label">Enquiry Email</label>
+          <input
+            type="email"
+            id="contact-email"
+            class="form-input font-mono"
+            value={content.contact.email}
+          />
+        </div>
+      </div>
+    </section>
+
+    <div class="pages-footer-actions">
+      <button type="submit" class="btn btn-primary btn-lg">
+        SAVE ALL PAGE CHANGES
+      </button>
+    </div>
+  </form>
+</AdminLayout>
+
+<style>
+  .pages-form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .admin-view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .view-title {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .view-sub {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .editor-success-toast {
+    background-color: #E8F2EC;
+    border: 1px solid #1F6B42;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .toast-sub {
+    font-size: 0.82rem;
+    color: var(--color-deep-charcoal);
+    margin: 0.15rem 0 0 0;
+  }
+
+  .page-edit-card {
+    background-color: #FFFFFF;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .page-card-header {
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.75rem;
+  }
+
+  .page-card-title {
+    font-size: 1.2rem;
+    margin: 0.25rem 0 0 0;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .pages-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+</style>
+
+<script>
+  import { loadDemoState, saveDemoState } from '../../utils/demo-state';
+
+  const form = document.getElementById('pages-editor-form') as HTMLFormElement;
+  const toast = document.getElementById('pages-success-toast');
+
+  // Input elements
+  const homeEyebrow = document.getElementById('home-eyebrow') as HTMLInputElement;
+  const homeHeadline = document.getElementById('home-headline') as HTMLInputElement;
+  const homeDesc = document.getElementById('home-desc') as HTMLTextAreaElement;
+  const homeCta = document.getElementById('home-cta-pri') as HTMLInputElement;
+  const homeEditHead = document.getElementById('home-edit-head') as HTMLInputElement;
+  const homeEditPara = document.getElementById('home-edit-para') as HTMLTextAreaElement;
+
+  const aboutHead = document.getElementById('about-headline') as HTMLInputElement;
+  const aboutIntro = document.getElementById('about-intro') as HTMLTextAreaElement;
+
+  const contactHead = document.getElementById('contact-headline') as HTMLInputElement;
+  const contactIntro = document.getElementById('contact-intro') as HTMLTextAreaElement;
+  const contactPhone = document.getElementById('contact-phone') as HTMLInputElement;
+  const contactEmail = document.getElementById('contact-email') as HTMLInputElement;
+
+  function hydrateFields() {
+    const state = loadDemoState();
+    const c = state.siteContent;
+    if (homeEyebrow && c.homepage.heroEyebrow) homeEyebrow.value = c.homepage.heroEyebrow;
+    if (homeHeadline && c.homepage.heroHeadline) homeHeadline.value = c.homepage.heroHeadline;
+    if (homeDesc && c.homepage.heroDescription) homeDesc.value = c.homepage.heroDescription;
+    if (homeCta && c.homepage.primaryCtaText) homeCta.value = c.homepage.primaryCtaText;
+    if (homeEditHead && c.homepage.editorialHeadline) homeEditHead.value = c.homepage.editorialHeadline;
+    if (homeEditPara && c.homepage.editorialParagraph) homeEditPara.value = c.homepage.editorialParagraph;
+
+    if (aboutHead && c.about.heroHeadline) aboutHead.value = c.about.heroHeadline;
+    if (aboutIntro && c.about.introParagraph) aboutIntro.value = c.about.introParagraph;
+
+    if (contactHead && c.contact.heroHeadline) contactHead.value = c.contact.heroHeadline;
+    if (contactIntro && c.contact.introText) contactIntro.value = c.contact.introText;
+    if (contactPhone && c.contact.phone) contactPhone.value = c.contact.phone;
+    if (contactEmail && c.contact.email) contactEmail.value = c.contact.email;
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const state = loadDemoState();
+
+    state.siteContent.homepage.heroEyebrow = homeEyebrow.value.trim();
+    state.siteContent.homepage.heroHeadline = homeHeadline.value.trim();
+    state.siteContent.homepage.heroDescription = homeDesc.value.trim();
+    state.siteContent.homepage.primaryCtaText = homeCta.value.trim();
+    state.siteContent.homepage.editorialHeadline = homeEditHead.value.trim();
+    state.siteContent.homepage.editorialParagraph = homeEditPara.value.trim();
+
+    state.siteContent.about.heroHeadline = aboutHead.value.trim();
+    state.siteContent.about.introParagraph = aboutIntro.value.trim();
+
+    state.siteContent.contact.heroHeadline = contactHead.value.trim();
+    state.siteContent.contact.introText = contactIntro.value.trim();
+    state.siteContent.contact.phone = contactPhone.value.trim();
+    state.siteContent.contact.email = contactEmail.value.trim();
+
+    saveDemoState(state);
+
+    if (toast) toast.style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  document.addEventListener('DOMContentLoaded', hydrateFields);
+</script>

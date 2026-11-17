@@ -1,0 +1,205 @@
+---
+// MainLayout.astro
+import '../styles/variables.css';
+import '../styles/global.css';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import OpeningLoader from '../components/OpeningLoader.astro';
+import EnquiryModal from '../components/EnquiryModal.astro';
+import SearchOverlay from '../components/SearchOverlay.astro';
+import CompareTray from '../components/CompareTray.astro';
+import QuickViewModal from '../components/QuickViewModal.astro';
+import CookieBanner from '../components/CookieBanner.astro';
+
+import { getMetaDefaults, type MetaProps } from '../utils/seo';
+import { getOrganizationSchema, getWebSiteSchema } from '../utils/schema';
+
+interface Props extends MetaProps {
+  breadcrumbs?: { name: string; url: string }[];
+  jsonLdSchema?: Record<string, any>[];
+}
+
+const {
+  title,
+  description,
+  canonical,
+  image,
+  type = 'website',
+  publishedTime,
+  author,
+  jsonLdSchema = []
+} = Astro.props;
+
+const meta = getMetaDefaults({ title, description, canonical, image, type, publishedTime, author });
+
+const orgSchema = getOrganizationSchema();
+const siteSchema = getWebSiteSchema();
+const combinedSchemas = [orgSchema, siteSchema, ...jsonLdSchema];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO Meta Tags -->
+    <title>{meta.title}</title>
+    <meta name="description" content={meta.description} />
+    <link rel="canonical" href={meta.canonical} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={meta.type} />
+    <meta property="og:url" content={meta.canonical} />
+    <meta property="og:title" content={meta.title} />
+    <meta property="og:description" content={meta.description} />
+    <meta property="og:image" content={meta.image} />
+    <meta property="og:site_name" content={meta.siteName} />
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {author && <meta property="article:author" content={author} />}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={meta.canonical} />
+    <meta name="twitter:title" content={meta.title} />
+    <meta name="twitter:description" content={meta.description} />
+    <meta name="twitter:image" content={meta.image} />
+
+    <!-- Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- JSON-LD Structured Data -->
+    {combinedSchemas.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+  </head>
+  <body>
+    <!-- Opening Loader -->
+    <OpeningLoader />
+
+    <!-- Global Header -->
+    <Header />
+
+    <!-- Main Page Content -->
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <!-- Global Footer -->
+    <Footer />
+
+    <!-- Global Interactive Modals & Trays -->
+    <EnquiryModal />
+    <SearchOverlay />
+    <CompareTray />
+    <QuickViewModal />
+    <CookieBanner />
+
+    <!-- Client-side Synchronization Script: Hydrates CMS Edits dynamically -->
+    <script>
+      import { loadDemoState } from '../utils/demo-state';
+
+      function syncStorefrontWithDemoState() {
+        try {
+          const state = loadDemoState();
+          if (!state) return;
+
+          // 1. Update Products in DOM (Cards, Grids, Detail pages)
+          const productCards = document.querySelectorAll('[data-product-id]');
+          productCards.forEach((cardEl) => {
+            const card = cardEl as HTMLElement;
+            const pid = card.dataset.productId;
+            if (!pid) return;
+
+            const product = state.products.find((p) => p.id === pid);
+            if (!product) return;
+
+            // Update live fields inside card
+            const titleEl = card.querySelector('.product-live-name');
+            if (titleEl) titleEl.textContent = product.name;
+
+            const priceEl = card.querySelector('.product-live-price');
+            if (priceEl) priceEl.textContent = `$${(product.salePrice || product.price).toLocaleString()}`;
+
+            const descEl = card.querySelector('.product-live-desc');
+            if (descEl) descEl.textContent = product.shortDescription;
+
+            const imgEl = card.querySelector('.product-live-img') as HTMLImageElement;
+            if (imgEl && product.mainImage) {
+              imgEl.src = product.mainImage;
+            }
+
+            const availEl = card.querySelector('.product-live-avail');
+            if (availEl) {
+              availEl.textContent = product.specifications.availability;
+            }
+
+            const dimEl = card.querySelector('.product-live-dim');
+            if (dimEl) dimEl.textContent = product.specifications.dimensions;
+
+            const capEl = card.querySelector('.product-live-cap');
+            if (capEl) capEl.textContent = product.specifications.capacity;
+          });
+
+          // 2. Update Editable Site Content elements (Hero, About, etc.)
+          const heroHead = document.querySelector('[data-live-content="heroHeadline"]');
+          if (heroHead && state.siteContent.homepage.heroHeadline) {
+            heroHead.textContent = state.siteContent.homepage.heroHeadline;
+          }
+
+          const heroDesc = document.querySelector('[data-live-content="heroDescription"]');
+          if (heroDesc && state.siteContent.homepage.heroDescription) {
+            heroDesc.textContent = state.siteContent.homepage.heroDescription;
+          }
+
+          const heroEyebrow = document.querySelector('[data-live-content="heroEyebrow"]');
+          if (heroEyebrow && state.siteContent.homepage.heroEyebrow) {
+            heroEyebrow.textContent = state.siteContent.homepage.heroEyebrow;
+          }
+
+          const editHead = document.querySelector('[data-live-content="editorialHeadline"]');
+          if (editHead && state.siteContent.homepage.editorialHeadline) {
+            editHead.textContent = state.siteContent.homepage.editorialHeadline;
+          }
+
+          const editPara = document.querySelector('[data-live-content="editorialParagraph"]');
+          if (editPara && state.siteContent.homepage.editorialParagraph) {
+            editPara.textContent = state.siteContent.homepage.editorialParagraph;
+          }
+
+          // 3. Update Product Detail page if on /product/[slug]
+          const pdpContainer = document.querySelector('[data-pdp-id]');
+          if (pdpContainer) {
+            const pdpId = (pdpContainer as HTMLElement).dataset.pdpId;
+            const liveProd = state.products.find((p) => p.id === pdpId);
+            if (liveProd) {
+              const pdpTitle = document.querySelector('.pdp-live-title');
+              if (pdpTitle) pdpTitle.textContent = liveProd.name;
+
+              const pdpPrice = document.querySelector('.pdp-live-price');
+              if (pdpPrice) pdpPrice.textContent = `$${(liveProd.salePrice || liveProd.price).toLocaleString()}`;
+
+              const pdpDesc = document.querySelector('.pdp-live-desc');
+              if (pdpDesc) pdpDesc.textContent = liveProd.description;
+
+              const pdpMainImg = document.querySelector('.pdp-live-main-img') as HTMLImageElement;
+              if (pdpMainImg && liveProd.mainImage) {
+                pdpMainImg.src = liveProd.mainImage;
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Storefront sync notice:', e);
+        }
+      }
+
+      // Run on page load and on state update events
+      window.addEventListener('DOMContentLoaded', syncStorefrontWithDemoState);
+      window.addEventListener('tc-demo-state-updated', syncStorefrontWithDemoState);
+      window.addEventListener('storage', syncStorefrontWithDemoState);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,997 @@
+---
+// src/components/admin/ProductEditorForm.astro
+import type { Product } from '../../data/products';
+import { CATEGORIES } from '../../data/categories';
+
+interface Props {
+  product?: Product;
+  isNew?: boolean;
+}
+
+const { product, isNew = false } = Astro.props;
+
+const defaultProduct: Product = {
+  id: `prod-${Date.now()}`,
+  name: '',
+  slug: '',
+  price: 4500,
+  salePrice: undefined,
+  category: 'enclosed-trailers',
+  categoryName: 'Enclosed Trailers',
+  shortDescription: '',
+  description: '',
+  mainImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80',
+  gallery: [
+    'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=80'
+  ],
+  specifications: {
+    dimensions: '6 × 12 ft',
+    axles: 'Tandem 3,500 lb Dexter',
+    material: 'Tubular Steel Frame / Aluminum Skin',
+    capacity: '4,200 lbs payload',
+    colour: 'Deep Charcoal Metallic',
+    availability: 'In Stock',
+    gvwr: '7,000 lbs',
+    emptyWeight: '2,400 lbs',
+    hitchType: '2-5/16" A-Frame Coupler',
+    brakes: 'Electric Brakes Both Axles'
+  },
+  isFeatured: false,
+  seoTitle: '',
+  seoDescription: '',
+  updatedAt: new Date().toISOString().split('T')[0]
+};
+
+const current = product || defaultProduct;
+---
+<form id="product-editor-form" class="product-editor-form" data-is-new={isNew ? 'true' : 'false'} data-prod-id={current.id}>
+  <!-- Top Bar Actions -->
+  <div class="editor-header-sticky">
+    <div class="header-left">
+      <a href="/admin/products" class="back-link">&larr; All Products</a>
+      <h2 class="editor-page-title" id="form-heading-title">
+        {isNew ? 'Create New Trailer Model' : `Editing: ${current.name}`}
+      </h2>
+    </div>
+
+    <div class="header-actions">
+      <a href="/admin/products" class="btn btn-secondary btn-sm">Cancel</a>
+      {!isNew && (
+        <a id="btn-view-on-site" href={`/product/${current.slug}`} target="_blank" class="btn btn-secondary btn-sm">
+          Storefront Preview &rarr;
+        </a>
+      )}
+      <button type="button" id="btn-save-draft" class="btn btn-secondary btn-sm">
+        Save Draft
+      </button>
+      <button type="submit" id="btn-publish-product" class="btn btn-primary btn-sm">
+        {isNew ? 'Publish Product' : 'Save Changes'}
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Notification Alert -->
+  <div id="editor-success-toast" class="editor-success-toast" style="display: none;">
+    <div class="toast-content">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F6B42" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <div>
+        <strong>Changes Saved Successfully!</strong>
+        <p class="toast-sub">The product data has been updated in the shared demo state and is immediately visible on the storefront.</p>
+      </div>
+    </div>
+    <a id="toast-storefront-link" href={`/product/${current.slug}`} target="_blank" class="toast-cta">
+      View on Storefront &rarr;
+    </a>
+  </div>
+
+  <!-- Editor Two-Column Layout -->
+  <div class="editor-columns-grid">
+    <!-- LEFT MAIN COLUMN: Content, Pricing, Images, Specifications -->
+    <div class="editor-main-col">
+      <!-- Section 1: Basic Information -->
+      <section class="editor-section-card editorial-card">
+        <h3 class="section-card-title">1. BASIC INFORMATION</h3>
+        
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="p-name" class="form-label">Product Name *</label>
+            <input
+              type="text"
+              id="p-name"
+              name="name"
+              class="form-input"
+              value={current.name}
+              placeholder="e.g. Enclosed Cargo 6×12"
+              required
+            />
+          </div>
+
+          <div class="form-group flex-2">
+            <label for="p-slug" class="form-label">URL Slug *</label>
+            <input
+              type="text"
+              id="p-slug"
+              name="slug"
+              class="form-input font-mono"
+              value={current.slug}
+              placeholder="e.g. enclosed-cargo-6x12"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="p-category" class="form-label">Category *</label>
+            <select id="p-category" name="category" class="form-select">
+              {CATEGORIES.map((c) => (
+                <option value={c.slug} selected={c.slug === current.category}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="p-availability" class="form-label">Availability Status</label>
+            <select id="p-availability" name="availability" class="form-select">
+              <option value="In Stock" selected={current.specifications.availability === 'In Stock'}>In Stock (Immediate)</option>
+              <option value="Built to Order" selected={current.specifications.availability === 'Built to Order'}>Built to Order</option>
+              <option value="Available Soon" selected={current.specifications.availability === 'Available Soon'}>Available Soon</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="p-short-desc" class="form-label">Short Summary (Card Description)</label>
+          <input
+            type="text"
+            id="p-short-desc"
+            name="shortDescription"
+            class="form-input"
+            value={current.shortDescription}
+            placeholder="One-sentence teaser describing target use and payload..."
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="p-desc" class="form-label">Full Technical Description *</label>
+          <textarea
+            id="p-desc"
+            name="description"
+            rows="5"
+            class="form-textarea"
+            placeholder="Comprehensive description of frame engineering, wall studs, floor material..."
+            required
+          >{current.description}</textarea>
+        </div>
+      </section>
+
+      <!-- Section 2: Pricing -->
+      <section class="editor-section-card editorial-card">
+        <h3 class="section-card-title">2. COMMERCIAL PRICING</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p-price" class="form-label">Base Demo Price ($ USD) *</label>
+            <input
+              type="number"
+              id="p-price"
+              name="price"
+              class="form-input font-mono"
+              value={current.price}
+              min="100"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="p-sale-price" class="form-label">Promotional Sale Price (Optional)</label>
+            <input
+              type="number"
+              id="p-sale-price"
+              name="salePrice"
+              class="form-input font-mono"
+              value={current.salePrice || ''}
+              placeholder="Leave blank if standard price"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Imagery & Photography -->
+      <section class="editor-section-card editorial-card">
+        <div class="section-card-head-row">
+          <h3 class="section-card-title">3. PHOTOGRAPHY & MEDIA</h3>
+          <span class="card-head-sub">Instant storefront replacement</span>
+        </div>
+
+        <!-- Main Photo Preview & Replacer -->
+        <div class="main-photo-editor-wrap">
+          <div class="photo-preview-box">
+            <img
+              id="editor-main-img-preview"
+              src={current.mainImage}
+              alt={current.name}
+              class="editor-img-preview"
+              onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'"
+            />
+          </div>
+
+          <div class="photo-inputs-col">
+            <div class="form-group">
+              <label for="p-main-img" class="form-label">Primary Image URL *</label>
+              <input
+                type="url"
+                id="p-main-img"
+                name="mainImage"
+                class="form-input font-mono"
+                value={current.mainImage}
+                required
+              />
+              <span class="form-hint">Enter any image URL or choose a preset asset below.</span>
+            </div>
+
+            <!-- Preset Samples Picker -->
+            <div class="preset-sample-picker">
+              <span class="preset-label">CHOOSE FROM PRESET ASSETS:</span>
+              <div class="preset-thumbs-row">
+                <button type="button" class="preset-thumb-btn" data-url="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80" title="Enclosed Trailer">
+                  <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=120&q=80" alt="Preset 1" />
+                </button>
+                <button type="button" class="preset-thumb-btn" data-url="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80" title="Utility Trailer">
+                  <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=120&q=80" alt="Preset 2" />
+                </button>
+                <button type="button" class="preset-thumb-btn" data-url="https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1200&q=80" title="Flatbed Trailer">
+                  <img src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=120&q=80" alt="Preset 3" />
+                </button>
+                <button type="button" class="preset-thumb-btn" data-url="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=80" title="Cargo V-Nose">
+                  <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=120&q=80" alt="Preset 4" />
+                </button>
+                <button type="button" class="preset-thumb-btn" data-url="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80" title="Horse Trailer">
+                  <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=120&q=80" alt="Preset 5" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Local file upload preview -->
+            <div class="local-upload-option">
+              <label class="btn-file-upload">
+                <input type="file" id="p-upload-file-input" accept="image/*" style="display: none;" />
+                <span>Upload Local Image File (Data URL)</span>
+              </label>
+              <span class="form-hint">Converts to local base64 preview for demo storage.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Specifications -->
+      <section class="editor-section-card editorial-card">
+        <h3 class="section-card-title">4. DETAILED SPECIFICATIONS</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p-dimensions" class="form-label">Dimensions (e.g. 6 × 12 ft)</label>
+            <input
+              type="text"
+              id="p-dimensions"
+              name="dimensions"
+              class="form-input"
+              value={current.specifications.dimensions}
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="p-axles" class="form-label">Axles (e.g. Tandem 3,500 lb Dexter)</label>
+            <input
+              type="text"
+              id="p-axles"
+              name="axles"
+              class="form-input"
+              value={current.specifications.axles}
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p-capacity" class="form-label">Payload Capacity (e.g. 4,450 lbs)</label>
+            <input
+              type="text"
+              id="p-capacity"
+              name="capacity"
+              class="form-input"
+              value={current.specifications.capacity}
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="p-material" class="form-label">Frame / Skin Material</label>
+            <input
+              type="text"
+              id="p-material"
+              name="material"
+              class="form-input"
+              value={current.specifications.material}
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p-gvwr" class="form-label">GVWR (Gross Rating)</label>
+            <input
+              type="text"
+              id="p-gvwr"
+              name="gvwr"
+              class="form-input"
+              value={current.specifications.gvwr}
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="p-colour" class="form-label">Standard Colour Finish</label>
+            <input
+              type="text"
+              id="p-colour"
+              name="colour"
+              class="form-input"
+              value={current.specifications.colour}
+            />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT SIDEBAR COLUMN: Google SEO Preview & Publishing Status -->
+    <div class="editor-side-col">
+      <!-- Publishing Status Card -->
+      <div class="side-panel editorial-card">
+        <h4 class="side-panel-title">PUBLISHING</h4>
+        <div class="publish-meta-block">
+          <div class="meta-line">
+            <span class="meta-label">Status:</span>
+            <span class="badge badge-stock">Published (Live)</span>
+          </div>
+          <div class="meta-line">
+            <span class="meta-label">Collection:</span>
+            <span>Products</span>
+          </div>
+          <div class="meta-line">
+            <span class="meta-label">Last Saved:</span>
+            <span id="label-last-updated">{current.updatedAt}</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          {isNew ? 'Publish Product' : 'Save Changes'}
+        </button>
+      </div>
+
+      <!-- Google Search Preview Card (Requirement 16) -->
+      <div class="side-panel editorial-card">
+        <div class="side-panel-head-row">
+          <h4 class="side-panel-title">GOOGLE SEARCH PREVIEW</h4>
+          <span class="badge badge-category">SEO</span>
+        </div>
+        <p class="panel-desc">Real-time simulation of Google SERP snippet.</p>
+
+        <!-- Google Snippet Box -->
+        <div class="google-snippet-box">
+          <div class="google-snippet-site">
+            <div class="google-favicon"></div>
+            <span class="google-domain">trailercommerce.demo</span>
+            <span class="google-path" id="seo-preview-path">/product/{current.slug || 'slug'}</span>
+          </div>
+          <h4 class="google-snippet-title" id="seo-preview-title">
+            {current.seoTitle || `${current.name || 'Trailer Title'} | Trailer Commerce`}
+          </h4>
+          <p class="google-snippet-desc" id="seo-preview-desc">
+            {current.seoDescription || current.shortDescription || 'Discover high payload commercial trailers with tandem Dexter axles and weather-sealed construction.'}
+          </p>
+        </div>
+
+        <!-- SEO Field Inputs -->
+        <div class="form-group" style="margin-top: 1.25rem;">
+          <div class="label-row">
+            <label for="p-seo-title" class="form-label">SEO Meta Title</label>
+            <span class="char-count" id="count-seo-title">0 / 60</span>
+          </div>
+          <input
+            type="text"
+            id="p-seo-title"
+            name="seoTitle"
+            class="form-input"
+            value={current.seoTitle || `${current.name} | Trailer Commerce`}
+          />
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="p-seo-desc" class="form-label">Meta Description</label>
+            <span class="char-count" id="count-seo-desc">0 / 160</span>
+          </div>
+          <textarea
+            id="p-seo-desc"
+            name="seoDescription"
+            rows="3"
+            class="form-textarea"
+          >{current.seoDescription || current.shortDescription}</textarea>
+        </div>
+
+        <!-- SEO Completeness Score -->
+        <div class="seo-score-widget">
+          <div class="score-header">
+            <span>SEO Health Indicator</span>
+            <span id="seo-score-pct" class="score-pct">95%</span>
+          </div>
+          <div class="score-bar">
+            <div id="seo-score-bar-fill" class="score-bar-fill" style="width: 95%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<style>
+  .product-editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  /* Header Sticky Actions */
+  .editor-header-sticky {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-medium);
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .back-link:hover {
+    color: var(--color-deep-charcoal);
+  }
+
+  .editor-page-title {
+    font-size: 1.45rem;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  /* Success Toast */
+  .editor-success-toast {
+    background-color: #E8F2EC;
+    border: 1px solid #1F6B42;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .toast-content strong {
+    color: #1F6B42;
+    font-size: 0.92rem;
+  }
+
+  .toast-sub {
+    font-size: 0.82rem;
+    color: var(--color-deep-charcoal);
+    margin: 0.15rem 0 0 0;
+  }
+
+  .toast-cta {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1F6B42;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+
+  /* Columns Grid */
+  .editor-columns-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .editor-columns-grid {
+      grid-template-columns: 1.8fr 1fr;
+    }
+  }
+
+  .editor-main-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .editor-section-card {
+    background-color: #FFFFFF;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .section-card-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .section-card-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.5rem;
+  }
+
+  .card-head-sub {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--color-forest-green);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  /* Photo Editor */
+  .main-photo-editor-wrap {
+    display: flex;
+    gap: 1.5rem;
+    flex-direction: column;
+  }
+
+  @media (min-width: 680px) {
+    .main-photo-editor-wrap {
+      flex-direction: row;
+    }
+  }
+
+  .photo-preview-box {
+    width: 220px;
+    height: 150px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background-color: var(--color-pale-sand);
+    border: 1px solid var(--border-medium);
+    flex-shrink: 0;
+  }
+
+  .editor-img-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-inputs-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .preset-sample-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .preset-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .preset-thumbs-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .preset-thumb-btn {
+    width: 48px;
+    height: 34px;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid var(--border-medium);
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+  }
+
+  .preset-thumb-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .btn-file-upload {
+    display: inline-block;
+    padding: 0.45rem 0.75rem;
+    background-color: var(--color-pale-sand);
+    border: 1px dashed var(--border-medium);
+    border-radius: var(--radius-xs);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-file-upload:hover {
+    background-color: var(--color-pure-white);
+    border-color: var(--color-forest-green);
+  }
+
+  /* Right Sidebar */
+  .editor-side-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .side-panel {
+    background-color: #FFFFFF;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .side-panel-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .side-panel-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .publish-meta-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+  }
+
+  .meta-line {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .meta-label {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  .panel-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* Google Search Snippet Box */
+  .google-snippet-box {
+    background-color: #FFFFFF;
+    border: 1px solid #DFE1E5;
+    border-radius: var(--radius-md);
+    padding: 1rem 1.15rem;
+    font-family: arial, sans-serif;
+  }
+
+  .google-snippet-site {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: #202124;
+    margin-bottom: 0.25rem;
+  }
+
+  .google-favicon {
+    width: 14px;
+    height: 14px;
+    background-color: var(--color-forest-green);
+    border-radius: 50%;
+  }
+
+  .google-path {
+    color: #4D5156;
+  }
+
+  .google-snippet-title {
+    color: #1A0DAB;
+    font-size: 1.05rem;
+    font-weight: 400;
+    line-height: 1.3;
+    margin: 0.2rem 0 0.35rem 0;
+    cursor: pointer;
+  }
+
+  .google-snippet-desc {
+    color: #4D5156;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  .label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .char-count {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .seo-score-widget {
+    background-color: #F8F9FA;
+    border-radius: var(--radius-xs);
+    padding: 0.75rem;
+  }
+
+  .score-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+
+  .score-bar {
+    width: 100%;
+    height: 4px;
+    background-color: #E2E8F0;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    background-color: #1F6B42;
+    transition: width 0.3s ease;
+  }
+</style>
+
+<script>
+  import { loadDemoState, upsertStoredProduct, type Product } from '../../utils/demo-state';
+
+  const form = document.getElementById('product-editor-form') as HTMLFormElement;
+  const isNew = form?.dataset.isNew === 'true';
+  const prodId = form?.dataset.prodId || '';
+
+  // Form inputs
+  const nameInput = document.getElementById('p-name') as HTMLInputElement;
+  const slugInput = document.getElementById('p-slug') as HTMLInputElement;
+  const categorySelect = document.getElementById('p-category') as HTMLSelectElement;
+  const availSelect = document.getElementById('p-availability') as HTMLSelectElement;
+  const shortDescInput = document.getElementById('p-short-desc') as HTMLInputElement;
+  const descInput = document.getElementById('p-desc') as HTMLTextAreaElement;
+  const priceInput = document.getElementById('p-price') as HTMLInputElement;
+  const salePriceInput = document.getElementById('p-sale-price') as HTMLInputElement;
+  const mainImgInput = document.getElementById('p-main-img') as HTMLInputElement;
+  const imgPreview = document.getElementById('editor-main-img-preview') as HTMLImageElement;
+  const uploadFileInput = document.getElementById('p-upload-file-input') as HTMLInputElement;
+
+  const dimInput = document.getElementById('p-dimensions') as HTMLInputElement;
+  const axlesInput = document.getElementById('p-axles') as HTMLInputElement;
+  const capInput = document.getElementById('p-capacity') as HTMLInputElement;
+  const matInput = document.getElementById('p-material') as HTMLInputElement;
+  const gvwrInput = document.getElementById('p-gvwr') as HTMLInputElement;
+  const colourInput = document.getElementById('p-colour') as HTMLInputElement;
+
+  // SEO Preview Elements
+  const seoTitleInput = document.getElementById('p-seo-title') as HTMLInputElement;
+  const seoDescInput = document.getElementById('p-seo-desc') as HTMLTextAreaElement;
+  const seoPreviewTitle = document.getElementById('seo-preview-title');
+  const seoPreviewDesc = document.getElementById('seo-preview-desc');
+  const seoPreviewPath = document.getElementById('seo-preview-path');
+  const countSeoTitle = document.getElementById('count-seo-title');
+  const countSeoDesc = document.getElementById('count-seo-desc');
+  const seoScorePct = document.getElementById('seo-score-pct');
+  const seoScoreBar = document.getElementById('seo-score-bar-fill');
+
+  const toast = document.getElementById('editor-success-toast');
+  const toastLink = document.getElementById('toast-storefront-link') as HTMLAnchorElement;
+
+  // Auto-slugify on title input if new
+  if (isNew && nameInput && slugInput) {
+    nameInput.addEventListener('input', () => {
+      slugInput.value = nameInput.value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      updateSeoPreview();
+    });
+  }
+
+  // Update SEO Snippet live
+  function updateSeoPreview() {
+    const titleVal = seoTitleInput?.value.trim() || nameInput?.value.trim() || 'Trailer Model';
+    const descVal = seoDescInput?.value.trim() || shortDescInput?.value.trim() || 'Trailer specifications and price.';
+    const slugVal = slugInput?.value.trim() || 'product-slug';
+
+    if (seoPreviewTitle) seoPreviewTitle.textContent = titleVal.includes('Trailer') ? titleVal : `${titleVal} | Trailer Commerce`;
+    if (seoPreviewDesc) seoPreviewDesc.textContent = descVal;
+    if (seoPreviewPath) seoPreviewPath.textContent = `/product/${slugVal}`;
+
+    if (countSeoTitle) countSeoTitle.textContent = `${titleVal.length} / 60`;
+    if (countSeoDesc) countSeoDesc.textContent = `${descVal.length} / 160`;
+
+    // Calculate score
+    let score = 50;
+    if (titleVal.length >= 30 && titleVal.length <= 65) score += 25;
+    if (descVal.length >= 80 && descVal.length <= 165) score += 25;
+
+    if (seoScorePct) seoScorePct.textContent = `${score}%`;
+    if (seoScoreBar) seoScoreBar.style.width = `${score}%`;
+  }
+
+  seoTitleInput?.addEventListener('input', updateSeoPreview);
+  seoDescInput?.addEventListener('input', updateSeoPreview);
+  nameInput?.addEventListener('input', updateSeoPreview);
+  shortDescInput?.addEventListener('input', updateSeoPreview);
+  slugInput?.addEventListener('input', updateSeoPreview);
+  updateSeoPreview();
+
+  // Image Preview & Presets
+  mainImgInput?.addEventListener('input', () => {
+    if (imgPreview && mainImgInput.value) {
+      imgPreview.src = mainImgInput.value;
+    }
+  });
+
+  document.querySelectorAll('.preset-thumb-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const url = (btn as HTMLElement).dataset.url;
+      if (url && mainImgInput && imgPreview) {
+        mainImgInput.value = url;
+        imgPreview.src = url;
+      }
+    });
+  });
+
+  // Local File Upload -> Base64 Data URL (for local demo)
+  uploadFileInput?.addEventListener('change', () => {
+    const file = uploadFileInput.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        if (result && mainImgInput && imgPreview) {
+          mainImgInput.value = result;
+          imgPreview.src = result;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Save / Publish Action
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveProductChanges(false);
+  });
+
+  document.getElementById('btn-save-draft')?.addEventListener('click', () => {
+    saveProductChanges(true);
+  });
+
+  function saveProductChanges(isDraft: boolean) {
+    const state = loadDemoState();
+    const existing = state.products.find((p) => p.id === prodId);
+
+    const categorySlug = categorySelect.value;
+    const catObj = state.categories.find((c) => c.slug === categorySlug);
+
+    const price = parseFloat(priceInput.value) || 0;
+    const salePrice = salePriceInput.value ? parseFloat(salePriceInput.value) : undefined;
+    const availVal = isDraft ? 'Available Soon' : ((availSelect.value as any) || 'In Stock');
+
+    const updatedProduct: Product = {
+      id: prodId,
+      name: nameInput.value.trim(),
+      slug: slugInput.value.trim(),
+      price: price,
+      salePrice: salePrice,
+      category: categorySlug,
+      categoryName: catObj?.name || 'Trailers',
+      shortDescription: shortDescInput.value.trim(),
+      description: descInput.value.trim(),
+      mainImage: mainImgInput.value.trim(),
+      gallery: existing?.gallery || [mainImgInput.value.trim()],
+      specifications: {
+        dimensions: dimInput.value.trim() || '6 × 12 ft',
+        axles: axlesInput.value.trim() || 'Tandem Dexter',
+        material: matInput.value.trim() || 'Tubular Steel Frame',
+        capacity: capInput.value.trim() || '4,000 lbs',
+        colour: colourInput.value.trim() || 'Deep Charcoal',
+        availability: availVal,
+        gvwr: gvwrInput.value.trim() || '7,000 lbs',
+        emptyWeight: existing?.specifications.emptyWeight || '2,400 lbs',
+        hitchType: existing?.specifications.hitchType || '2-5/16" Ball',
+        brakes: existing?.specifications.brakes || 'Electric Brakes'
+      },
+      seoTitle: seoTitleInput.value.trim() || `${nameInput.value} | Trailer Commerce`,
+      seoDescription: seoDescInput.value.trim() || shortDescInput.value.trim(),
+      updatedAt: new Date().toISOString().split('T')[0]
+    };
+
+    upsertStoredProduct(updatedProduct);
+
+    // Show toast
+    if (toast) {
+      toast.style.display = 'flex';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (toastLink) {
+      toastLink.href = `/product/${updatedProduct.slug}`;
+    }
+
+    const heading = document.getElementById('form-heading-title');
+    if (heading) heading.textContent = `Editing: ${updatedProduct.name}`;
+  }
+</script>

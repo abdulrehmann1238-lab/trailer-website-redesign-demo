@@ -1,0 +1,240 @@
+---
+// src/pages/admin/settings.astro
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { INITIAL_SITE_CONTENT } from '../../data/site-content';
+
+const settings = INITIAL_SITE_CONTENT.settings;
+---
+
+<AdminLayout title="Global Site Settings" activeNav="settings">
+  <form id="settings-form" class="settings-form-wrapper">
+    <div class="admin-view-header">
+      <div>
+        <h2 class="view-title">Platform Configuration</h2>
+        <p class="view-sub">Configure global brand identity, default search engine metadata, and system environment tokens.</p>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        SAVE SETTINGS
+      </button>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="settings-toast" class="editor-success-toast" style="display: none;">
+      <div>
+        <strong>Global Settings Saved!</strong>
+        <p class="toast-sub">Brand configuration and default SEO parameters have been updated.</p>
+      </div>
+    </div>
+
+    <!-- Brand Identity Card -->
+    <section class="settings-card editorial-card">
+      <h3 class="settings-card-title">BRAND IDENTITY</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="set-site-name" class="form-label">Brand Name</label>
+          <input
+            type="text"
+            id="set-site-name"
+            class="form-input"
+            value={settings.siteName}
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="set-tagline" class="form-label">Brand Tagline</label>
+          <input
+            type="text"
+            id="set-tagline"
+            class="form-input"
+            value={settings.tagline}
+            required
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Global SEO Card -->
+    <section class="settings-card editorial-card">
+      <h3 class="settings-card-title">DEFAULT SEARCH ENGINE OPTIMIZATION</h3>
+
+      <div class="form-group">
+        <label for="set-seo-title" class="form-label">Default Meta Title</label>
+        <input
+          type="text"
+          id="set-seo-title"
+          class="form-input"
+          value={settings.defaultSeoTitle}
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="set-seo-desc" class="form-label">Default Meta Description</label>
+        <textarea
+          id="set-seo-desc"
+          rows="3"
+          class="form-textarea"
+          required
+        >{settings.defaultSeoDescription}</textarea>
+      </div>
+    </section>
+
+    <!-- Factory Reset Danger Zone -->
+    <section class="settings-card editorial-card danger-card">
+      <div class="danger-header">
+        <h3 class="settings-card-title danger-title">DEMONSTRATION STATE CONTROL</h3>
+        <span class="badge" style="background-color: #FDEDED; color: #9F3A38;">FACTORY RESET</span>
+      </div>
+      <p class="danger-text">
+        If you have created test products, deleted items, or modified copy during demonstration testing, click below to wipe browser local storage and restore original seed data.
+      </p>
+      <div>
+        <button type="button" id="btn-factory-reset" class="btn btn-secondary" style="color: #A82424; border-color: #A82424;">
+          Reset All Data to Factory Seed Defaults
+        </button>
+      </div>
+    </section>
+  </form>
+</AdminLayout>
+
+<style>
+  .settings-form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .admin-view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .view-title {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .view-sub {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .editor-success-toast {
+    background-color: #E8F2EC;
+    border: 1px solid #1F6B42;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .toast-sub {
+    font-size: 0.82rem;
+    color: var(--color-deep-charcoal);
+    margin: 0.15rem 0 0 0;
+  }
+
+  .settings-card {
+    background-color: #FFFFFF;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .settings-card-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .danger-card {
+    border-color: rgba(168, 36, 36, 0.25);
+  }
+
+  .danger-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .danger-title {
+    color: #A82424;
+  }
+
+  .danger-text {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+</style>
+
+<script>
+  import { loadDemoState, saveDemoState, resetDemoState } from '../../utils/demo-state';
+
+  const form = document.getElementById('settings-form') as HTMLFormElement;
+  const toast = document.getElementById('settings-toast');
+
+  const siteNameInput = document.getElementById('set-site-name') as HTMLInputElement;
+  const taglineInput = document.getElementById('set-tagline') as HTMLInputElement;
+  const seoTitleInput = document.getElementById('set-seo-title') as HTMLInputElement;
+  const seoDescInput = document.getElementById('set-seo-desc') as HTMLTextAreaElement;
+  const resetBtn = document.getElementById('btn-factory-reset');
+
+  function hydrateSettings() {
+    const state = loadDemoState();
+    const s = state.siteContent.settings;
+    if (siteNameInput && s.siteName) siteNameInput.value = s.siteName;
+    if (taglineInput && s.tagline) taglineInput.value = s.tagline;
+    if (seoTitleInput && s.defaultSeoTitle) seoTitleInput.value = s.defaultSeoTitle;
+    if (seoDescInput && s.defaultSeoDescription) seoDescInput.value = s.defaultSeoDescription;
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const state = loadDemoState();
+    state.siteContent.settings.siteName = siteNameInput.value.trim();
+    state.siteContent.settings.tagline = taglineInput.value.trim();
+    state.siteContent.settings.defaultSeoTitle = seoTitleInput.value.trim();
+    state.siteContent.settings.defaultSeoDescription = seoDescInput.value.trim();
+    saveDemoState(state);
+
+    if (toast) toast.style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  resetBtn?.addEventListener('click', () => {
+    if (confirm('Are you certain you want to wipe all demo edits and return to original demo data?')) {
+      resetDemoState();
+      alert('Data reset successfully.');
+      window.location.reload();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', hydrateSettings);
+</script>

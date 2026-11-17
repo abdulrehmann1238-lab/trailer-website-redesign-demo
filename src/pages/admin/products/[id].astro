@@ -1,0 +1,23 @@
+---
+// src/pages/admin/products/[id].astro
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import ProductEditorForm from '../../../components/admin/ProductEditorForm.astro';
+import { INITIAL_PRODUCTS, type Product } from '../../../data/products';
+
+export function getStaticPaths() {
+  return INITIAL_PRODUCTS.map((product) => ({
+    params: { id: product.id },
+    props: { product }
+  }));
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+---
+
+<AdminLayout title={`Edit: ${product.name}`} activeNav="products">
+  <ProductEditorForm product={product} isNew={false} />
+</AdminLayout>

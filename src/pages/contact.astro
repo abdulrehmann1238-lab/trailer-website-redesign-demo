@@ -1,0 +1,563 @@
+---
+// src/pages/contact.astro
+import MainLayout from '../layouts/MainLayout.astro';
+import { INITIAL_SITE_CONTENT } from '../data/site-content';
+import { INITIAL_PRODUCTS } from '../data/products';
+import { getBreadcrumbSchema } from '../utils/schema';
+
+const contactContent = INITIAL_SITE_CONTENT.contact;
+
+const breadcrumbs = [
+  { name: 'Home', url: '/' },
+  { name: 'Contact', url: '/contact' }
+];
+
+const breadcrumbSchema = getBreadcrumbSchema(breadcrumbs);
+
+const generalFaqs = [
+  {
+    q: 'Can I schedule an in-person inspection of a specific trailer?',
+    a: 'Yes. While this website serves as a live digital demonstration for client Serkan, in a production setup appointments can be booked directly for yard walkthroughs and hitch measurements.'
+  },
+  {
+    q: 'How do you verify whether my tow vehicle can safely haul a trailer?',
+    a: 'We evaluate your vehicle gross combined weight rating (GCWR), hitch class rating (Class III, IV, or V), and rear axle GAWR to verify compliance with trailer tongue weight.'
+  },
+  {
+    q: 'Do your trailers include certificates of origin for registration?',
+    a: 'All commercial trailers include Manufacturer Certificate of Origin (MCO), official bill of sale, and VIN certification decals required by state motor vehicle licensing authorities.'
+  }
+];
+---
+
+<MainLayout
+  title="Contact Trailer Specialists | Trailer Commerce"
+  description="Connect with our trailer specialists for payload recommendations, axle configurations, and custom commercial quotes."
+  canonical="/contact"
+  jsonLdSchema={[breadcrumbSchema]}
+>
+  <section class="contact-hero-section">
+    <div class="container">
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-separator">/</li>
+          <li class="breadcrumb-item is-current" aria-current="page">Contact</li>
+        </ol>
+      </nav>
+
+      <div class="contact-hero-content">
+        <span class="eyebrow eyebrow-forest">COMMERCIAL HAULING SUPPORT</span>
+        <h1 class="contact-title" data-live-content="contactHeroHeadline">
+          {contactContent.heroHeadline}
+        </h1>
+        <p class="contact-lead" data-live-content="contactIntroText">
+          {contactContent.introText}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Workspace Grid: Info (Left) + Form (Right) -->
+  <section class="section contact-main-section">
+    <div class="container">
+      <div class="contact-grid">
+        <!-- LEFT: Contact Information & Direct Channels -->
+        <div class="contact-info-col">
+          <div class="info-card editorial-card">
+            <h3 class="info-card-title">DIRECT CHANNELS</h3>
+            
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+              </div>
+              <div>
+                <span class="info-label">PHONE CONSULTATION</span>
+                <span class="info-val">{contactContent.phone}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+              </div>
+              <div>
+                <span class="info-label">EMAIL ENQUIRIES</span>
+                <span class="info-val">{contactContent.email}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <div>
+                <span class="info-label">OPERATIONAL HOURS</span>
+                <span class="info-val">{contactContent.hours}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </div>
+              <div>
+                <span class="info-label">DISTRIBUTION CENTER</span>
+                <span class="info-val">{contactContent.locationNote}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick CMS Demo Notice -->
+          <div class="cms-prompt-card">
+            <span class="eyebrow eyebrow-forest">CMS DEMONSTRATION</span>
+            <h4 class="cms-prompt-title">Managing Contact Info</h4>
+            <p class="cms-prompt-p">
+              The phone number, email, and hours displayed on this page can be updated live from the <strong>/admin/pages</strong> or <strong>/admin/settings</strong> panels.
+            </p>
+            <a href="/admin/pages" class="cms-prompt-link">
+              Edit in Admin Dashboard &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- RIGHT: Interactive Enquiry Form -->
+        <div class="contact-form-col">
+          <div class="form-card editorial-card">
+            <div class="form-header">
+              <span class="eyebrow eyebrow-forest">SPECIFICATIONS REQUEST</span>
+              <h2 class="form-card-heading">Send an Enquiry</h2>
+              <p class="form-card-sub">
+                Complete the fields below and our trailer advisors will compile load ratings and equipment availability.
+              </p>
+            </div>
+
+            <form id="contact-full-form" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="cf-name" class="form-label">Full Name *</label>
+                  <input type="text" id="cf-name" class="form-input" placeholder="e.g. Marcus Vance" required />
+                  <span id="err-cf-name" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                  <label for="cf-email" class="form-label">Email Address *</label>
+                  <input type="email" id="cf-email" class="form-input" placeholder="name@company.com" required />
+                  <span id="err-cf-email" class="form-error"></span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="cf-phone" class="form-label">Phone Number *</label>
+                  <input type="tel" id="cf-phone" class="form-input" placeholder="(555) 000-0000" required />
+                  <span id="err-cf-phone" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                  <label for="cf-product" class="form-label">Specific Trailer of Interest</label>
+                  <select id="cf-product" class="form-select">
+                    <option value="">-- General Sizing / Fleet Advice --</option>
+                    {INITIAL_PRODUCTS.map((p) => (
+                      <option value={p.name}>{p.name} (${p.price.toLocaleString()})</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Preferred Response Method</label>
+                <div class="contact-method-options">
+                  <label class="method-label">
+                    <input type="radio" name="cf-method" value="email" checked />
+                    <span>Email Response</span>
+                  </label>
+                  <label class="method-label">
+                    <input type="radio" name="cf-method" value="phone" />
+                    <span>Phone Call</span>
+                  </label>
+                  <label class="method-label">
+                    <input type="radio" name="cf-method" value="text" />
+                    <span>SMS / WhatsApp</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="cf-message" class="form-label">Project or Hauling Details *</label>
+                <textarea
+                  id="cf-message"
+                  rows="4"
+                  class="form-textarea"
+                  placeholder="Detail what equipment or cargo you intend to transport, towing vehicle make/model, or target delivery timeframe..."
+                  required
+                ></textarea>
+                <span id="err-cf-message" class="form-error"></span>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg btn-block">
+                SUBMIT ENQUIRY TO SPECIALISTS
+              </button>
+              
+              <p class="form-demo-note">
+                * Simulated demonstration form. Submitted data is confirmed locally in-browser without sending unsolicited external mail.
+              </p>
+            </form>
+
+            <!-- Success Box -->
+            <div id="contact-success-state" class="contact-success-box" style="display: none;">
+              <div class="success-icon-wrap">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#26372F" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <h3 class="success-title">ENQUIRY RECORDED</h3>
+              <p class="success-p">
+                Thank you, <strong id="contact-success-name">there</strong>. In a live production deployment, this enquiry would be automatically synced into Payload CMS Leads and routed to your email.
+              </p>
+              <button id="contact-reset-form-btn" class="btn btn-primary">
+                SUBMIT ANOTHER ENQUIRY
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- General FAQs Section -->
+  <section class="section-tight contact-faq-section">
+    <div class="container">
+      <div class="section-head-centered">
+        <span class="eyebrow eyebrow-forest">COMMONLY ASKED QUESTIONS</span>
+        <h2 class="section-heading">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="contact-faq-list">
+        {generalFaqs.map((faq) => (
+          <div class="faq-card editorial-card">
+            <h4 class="faq-q">{faq.q}</h4>
+            <p class="faq-a">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<style>
+  .contact-hero-section {
+    background-color: var(--color-pale-sand);
+    border-bottom: 1px solid var(--border-medium);
+    padding: clamp(2.5rem, 5vw, 4.5rem) 0;
+  }
+
+  .contact-title {
+    margin: 0.4rem 0 0.85rem 0;
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  }
+
+  .contact-lead {
+    max-width: 760px;
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  /* Grid */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+  }
+
+  @media (min-width: 992px) {
+    .contact-grid {
+      grid-template-columns: 360px 1fr;
+    }
+  }
+
+  /* Left Info */
+  .contact-info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .info-card {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .info-card-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .info-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .info-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--color-pale-sand);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-forest-green);
+    flex-shrink: 0;
+  }
+
+  .info-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .info-val {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+    margin-top: 0.15rem;
+  }
+
+  .cms-prompt-card {
+    background-color: var(--color-pure-white);
+    border: 1px dashed var(--color-forest-green);
+    border-radius: var(--radius-sm);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cms-prompt-title {
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
+  .cms-prompt-p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  .cms-prompt-link {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+    text-decoration: underline;
+  }
+
+  /* Form Card */
+  .form-card {
+    padding: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  .form-header {
+    margin-bottom: 2rem;
+  }
+
+  .form-card-heading {
+    font-size: 1.85rem;
+    margin: 0.35rem 0 0.5rem 0;
+  }
+
+  .form-card-sub {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .contact-method-options {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+  }
+
+  .method-label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+
+  .method-label input {
+    accent-color: var(--color-forest-green);
+  }
+
+  .form-demo-note {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  /* Success State */
+  .contact-success-box {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .success-icon-wrap {
+    width: 64px;
+    height: 64px;
+    background-color: #E8F2EC;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .success-title {
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .success-p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 480px;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  /* FAQ List */
+  .contact-faq-section {
+    background-color: var(--color-pale-sand);
+    border-top: 1px solid var(--border-medium);
+  }
+
+  .contact-faq-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  .faq-card {
+    padding: 1.75rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .faq-q {
+    font-size: 1.15rem;
+    margin: 0;
+  }
+
+  .faq-a {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+</style>
+
+<script>
+  const form = document.getElementById('contact-full-form') as HTMLFormElement;
+  const successBox = document.getElementById('contact-success-state');
+  const nameSpan = document.getElementById('contact-success-name');
+  const resetBtn = document.getElementById('contact-reset-form-btn');
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let isValid = true;
+
+    const nameInput = document.getElementById('cf-name') as HTMLInputElement;
+    const emailInput = document.getElementById('cf-email') as HTMLInputElement;
+    const phoneInput = document.getElementById('cf-phone') as HTMLInputElement;
+    const messageInput = document.getElementById('cf-message') as HTMLTextAreaElement;
+
+    const errName = document.getElementById('err-cf-name');
+    const errEmail = document.getElementById('err-cf-email');
+    const errPhone = document.getElementById('err-cf-phone');
+    const errMessage = document.getElementById('err-cf-message');
+
+    if (errName) errName.textContent = '';
+    if (errEmail) errEmail.textContent = '';
+    if (errPhone) errPhone.textContent = '';
+    if (errMessage) errMessage.textContent = '';
+
+    if (!nameInput.value.trim()) {
+      if (errName) errName.textContent = 'Please provide your full name.';
+      isValid = false;
+    }
+
+    if (!emailInput.value.trim() || !emailInput.value.includes('@') || !emailInput.value.includes('.')) {
+      if (errEmail) errEmail.textContent = 'Please enter a valid email address.';
+      isValid = false;
+    }
+
+    if (!phoneInput.value.trim() || phoneInput.value.replace(/\D/g, '').length < 7) {
+      if (errPhone) errPhone.textContent = 'Please enter a valid telephone number.';
+      isValid = false;
+    }
+
+    if (!messageInput.value.trim()) {
+      if (errMessage) errMessage.textContent = 'Please describe your equipment or hauling requirements.';
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
+    if (nameSpan) nameSpan.textContent = nameInput.value.trim();
+    if (form) form.style.display = 'none';
+    if (successBox) successBox.style.display = 'flex';
+  });
+
+  resetBtn?.addEventListener('click', () => {
+    if (form) {
+      form.reset();
+      form.style.display = 'block';
+    }
+    if (successBox) successBox.style.display = 'none';
+  });
+</script>

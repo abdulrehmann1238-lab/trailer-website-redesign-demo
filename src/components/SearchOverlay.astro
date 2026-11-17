@@ -1,0 +1,484 @@
+---
+// SearchOverlay.astro
+---
+<div id="search-overlay" class="search-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="search-modal">
+    <div class="search-top-bar">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          id="search-main-input"
+          class="search-main-input"
+          placeholder="Search by trailer model, category, dimensions, or article topic..."
+          autocomplete="off"
+        />
+        <button id="search-clear-btn" class="search-clear-btn" aria-label="Clear search input">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <button id="search-close-btn" class="search-close-btn" aria-label="Close search overlay">
+        <span class="esc-badge">ESC</span>
+      </button>
+    </div>
+
+    <!-- Live Results View -->
+    <div id="search-results-area" class="search-results-area">
+      <!-- Quick suggestions when query is empty -->
+      <div id="search-default-hints" class="search-hints">
+        <span class="hints-heading">POPULAR SUGGESTIONS</span>
+        <div class="hints-tags">
+          <button class="hint-tag" data-query="Enclosed">Enclosed Trailers</button>
+          <button class="hint-tag" data-query="Tandem">Tandem Axle</button>
+          <button class="hint-tag" data-query="Utility">Utility 5×8</button>
+          <button class="hint-tag" data-query="Flatbed">Flatbed 7×16</button>
+          <button class="hint-tag" data-query="Bearings">Bearing Maintenance</button>
+        </div>
+      </div>
+
+      <!-- Filtered Results Container -->
+      <div id="search-dynamic-results" class="search-dynamic-results" style="display: none;">
+        <!-- Trailers Column -->
+        <div class="results-group">
+          <span class="results-group-title">MATCHING TRAILERS (<span id="count-trailer-matches">0</span>)</span>
+          <div id="results-trailers-list" class="results-list"></div>
+        </div>
+
+        <!-- Articles Column -->
+        <div class="results-group">
+          <span class="results-group-title">JOURNAL ARTICLES (<span id="count-article-matches">0</span>)</span>
+          <div id="results-articles-list" class="results-list"></div>
+        </div>
+      </div>
+
+      <!-- No Results State -->
+      <div id="search-no-results" class="search-no-results" style="display: none;">
+        <p class="no-res-title">No matching inventory or articles found</p>
+        <p class="no-res-sub">Try searching for broader keywords like "cargo", "axle", "ramp", or "flatbed".</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(37, 39, 36, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 3500;
+    display: flex;
+    justify-content: center;
+    padding: clamp(1rem, 5vw, 4rem) 1.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+  }
+
+  .search-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .search-modal {
+    background-color: var(--color-warm-ivory);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-modal);
+    width: 100%;
+    max-width: 780px;
+    height: min(680px, 85vh);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(15px);
+    transition: transform var(--transition-base);
+  }
+
+  .search-overlay.is-open .search-modal {
+    transform: translateY(0);
+  }
+
+  .search-top-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-medium);
+    background-color: var(--color-pure-white);
+  }
+
+  .search-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    position: relative;
+  }
+
+  .search-icon {
+    color: var(--color-forest-green);
+    flex-shrink: 0;
+  }
+
+  .search-main-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    color: var(--color-deep-charcoal);
+    outline: none;
+  }
+
+  .search-clear-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: none;
+  }
+
+  .search-clear-btn.is-visible {
+    display: block;
+  }
+
+  .search-close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+  }
+
+  .esc-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--color-pale-sand);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-xs);
+    color: var(--text-secondary);
+  }
+
+  .search-results-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+
+  .hints-heading {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.85rem;
+  }
+
+  .hints-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .hint-tag {
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-full);
+    padding: 0.4rem 0.85rem;
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    color: var(--color-deep-charcoal);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .hint-tag:hover {
+    background-color: var(--color-forest-green);
+    color: var(--color-pure-white);
+    border-color: var(--color-forest-green);
+  }
+
+  .search-dynamic-results {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .search-dynamic-results {
+      grid-template-columns: 1.2fr 1fr;
+    }
+  }
+
+  .results-group-title {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--color-forest-green);
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  /* Item Cards in Search */
+  :global(.search-item-card) {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.65rem;
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  :global(.search-item-card:hover) {
+    border-color: var(--color-forest-green);
+    transform: translateX(3px);
+    box-shadow: var(--shadow-subtle);
+  }
+
+  :global(.search-thumb) {
+    width: 64px;
+    height: 48px;
+    border-radius: var(--radius-xs);
+    object-fit: cover;
+    background-color: var(--color-pale-sand);
+    flex-shrink: 0;
+  }
+
+  :global(.search-info) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  :global(.search-item-title) {
+    font-family: var(--font-heading);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.search-item-meta) {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  :global(.search-item-price) {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--color-forest-green);
+  }
+
+  .search-no-results {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .no-res-title {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+    margin-bottom: 0.4rem;
+  }
+
+  .no-res-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  import { loadDemoState } from '../utils/demo-state';
+
+  const overlay = document.getElementById('search-overlay');
+  const input = document.getElementById('search-main-input') as HTMLInputElement;
+  const clearBtn = document.getElementById('search-clear-btn');
+  const closeBtn = document.getElementById('search-close-btn');
+  const hints = document.getElementById('search-default-hints');
+  const dynamicResults = document.getElementById('search-dynamic-results');
+  const noResults = document.getElementById('search-no-results');
+  const trailersList = document.getElementById('results-trailers-list');
+  const articlesList = document.getElementById('results-articles-list');
+  const countTrailers = document.getElementById('count-trailer-matches');
+  const countArticles = document.getElementById('count-article-matches');
+
+  function openSearch() {
+    if (!overlay) return;
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => input?.focus(), 100);
+  }
+
+  function closeSearch() {
+    if (!overlay) return;
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  closeBtn?.addEventListener('click', closeSearch);
+
+  overlay?.addEventListener('click', (e) => {
+    if (e.target === overlay) closeSearch();
+  });
+
+  window.addEventListener('open-search-modal', openSearch);
+
+  // Keyboard shortcut '/' to open, 'Escape' to close
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) {
+      e.preventDefault();
+      openSearch();
+    }
+    if (e.key === 'Escape' && overlay?.classList.contains('is-open')) {
+      closeSearch();
+    }
+  });
+
+  clearBtn?.addEventListener('click', () => {
+    if (input) {
+      input.value = '';
+      input.focus();
+      handleSearchQuery('');
+    }
+  });
+
+  // Handle hint tag clicks
+  document.querySelectorAll('.hint-tag').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const q = (btn as HTMLElement).dataset.query || '';
+      if (input) {
+        input.value = q;
+        input.focus();
+        handleSearchQuery(q);
+      }
+    });
+  });
+
+  input?.addEventListener('input', () => {
+    handleSearchQuery(input.value.trim());
+  });
+
+  function handleSearchQuery(query: string) {
+    if (!query) {
+      clearBtn?.classList.remove('is-visible');
+      if (hints) hints.style.display = 'block';
+      if (dynamicResults) dynamicResults.style.display = 'none';
+      if (noResults) noResults.style.display = 'none';
+      return;
+    }
+
+    clearBtn?.classList.add('is-visible');
+    const state = loadDemoState();
+    const q = query.toLowerCase();
+
+    // Filter products
+    const matchedProducts = state.products.filter((p) => {
+      return (
+        p.name.toLowerCase().includes(q) ||
+        p.categoryName.toLowerCase().includes(q) ||
+        p.shortDescription.toLowerCase().includes(q) ||
+        p.specifications.dimensions.toLowerCase().includes(q) ||
+        p.specifications.axles.toLowerCase().includes(q)
+      );
+    });
+
+    // Filter articles
+    const matchedArticles = state.articles.filter((a) => {
+      return (
+        a.title.toLowerCase().includes(q) ||
+        a.category.toLowerCase().includes(q) ||
+        a.excerpt.toLowerCase().includes(q) ||
+        a.tags.some((t) => t.toLowerCase().includes(q))
+      );
+    });
+
+    if (hints) hints.style.display = 'none';
+
+    if (matchedProducts.length === 0 && matchedArticles.length === 0) {
+      if (dynamicResults) dynamicResults.style.display = 'none';
+      if (noResults) noResults.style.display = 'block';
+      return;
+    }
+
+    if (noResults) noResults.style.display = 'none';
+    if (dynamicResults) dynamicResults.style.display = 'grid';
+
+    if (countTrailers) countTrailers.textContent = String(matchedProducts.length);
+    if (countArticles) countArticles.textContent = String(matchedArticles.length);
+
+    // Render trailers
+    if (trailersList) {
+      if (matchedProducts.length === 0) {
+        trailersList.innerHTML = '<p class="mono-tag">No trailers match this term.</p>';
+      } else {
+        trailersList.innerHTML = matchedProducts.slice(0, 5).map((p) => `
+          <a href="/product/${p.slug}" class="search-item-card">
+            <img src="${p.mainImage}" alt="${p.name}" class="search-thumb" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=200&q=80'" />
+            <div class="search-info">
+              <span class="search-item-title">${p.name}</span>
+              <div class="search-item-meta">
+                <span>${p.categoryName}</span>
+                <span class="search-item-price">$${p.price.toLocaleString()}</span>
+              </div>
+            </div>
+          </a>
+        `).join('');
+      }
+    }
+
+    // Render articles
+    if (articlesList) {
+      if (matchedArticles.length === 0) {
+        articlesList.innerHTML = '<p class="mono-tag">No articles match this term.</p>';
+      } else {
+        articlesList.innerHTML = matchedArticles.slice(0, 3).map((a) => `
+          <a href="/blog/${a.slug}" class="search-item-card">
+            <img src="${a.coverImage}" alt="${a.title}" class="search-thumb" />
+            <div class="search-info">
+              <span class="search-item-title">${a.title}</span>
+              <div class="search-item-meta">
+                <span>${a.category}</span>
+                <span>${a.readingTime}</span>
+              </div>
+            </div>
+          </a>
+        `).join('');
+      }
+    }
+  }
+</script>

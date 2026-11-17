@@ -1,0 +1,570 @@
+---
+// src/pages/admin/index.astro
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { INITIAL_PRODUCTS } from '../../data/products';
+import { INITIAL_ARTICLES } from '../../data/articles';
+import { CATEGORIES } from '../../data/categories';
+---
+
+<AdminLayout title="Administration Dashboard" activeNav="dashboard">
+  <div class="dash-overview-wrapper">
+    <!-- Welcome Header Banner -->
+    <div class="dash-welcome-panel editorial-card">
+      <div class="welcome-text-col">
+        <span class="eyebrow eyebrow-forest">PAYLOAD CMS ARCHITECTURE</span>
+        <h2 class="welcome-heading">Welcome back, Serkan.</h2>
+        <p class="welcome-sub">
+          Manage your trailer catalog, update prices, adjust inventory availability, and upload media assets. All edits save to shared local storage and instantly propagate across the storefront.
+        </p>
+      </div>
+      <div class="welcome-actions-col">
+        <a href="/admin/products/new" class="btn btn-primary btn-sm">
+          + Add New Trailer
+        </a>
+        <a href="/" target="_blank" class="btn btn-secondary btn-sm">
+          View Storefront &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- Summary Metric Stat Cards -->
+    <div class="dash-stats-grid">
+      <div class="stat-card editorial-card">
+        <div class="stat-header">
+          <span class="stat-label">TOTAL TRAILERS</span>
+          <div class="stat-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-number" id="stat-total-products">{INITIAL_PRODUCTS.length}</div>
+        <span class="stat-footnote">Active in inventory database</span>
+      </div>
+
+      <div class="stat-card editorial-card">
+        <div class="stat-header">
+          <span class="stat-label">IN STOCK NOW</span>
+          <div class="stat-icon-wrap" style="color: #1F6B42; background-color: #E8F2EC;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-number" id="stat-instock-products">
+          {INITIAL_PRODUCTS.filter((p) => p.specifications.availability === 'In Stock').length}
+        </div>
+        <span class="stat-footnote">Ready for immediate customer pickup</span>
+      </div>
+
+      <div class="stat-card editorial-card">
+        <div class="stat-header">
+          <span class="stat-label">CATEGORIES</span>
+          <div class="stat-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-number">{CATEGORIES.length}</div>
+        <span class="stat-footnote">Trailer classifications active</span>
+      </div>
+
+      <div class="stat-card editorial-card">
+        <div class="stat-header">
+          <span class="stat-label">JOURNAL POSTS</span>
+          <div class="stat-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-number" id="stat-total-posts">{INITIAL_ARTICLES.length}</div>
+        <span class="stat-footnote">Published technical articles</span>
+      </div>
+    </div>
+
+    <!-- Quick Action Shortcut Buttons -->
+    <div class="quick-actions-strip">
+      <span class="strip-label">QUICK CMS TASKS:</span>
+      <div class="quick-btns-row">
+        <a href="/admin/products/new" class="quick-action-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Add New Product</span>
+        </a>
+        <a href="/admin/media" class="quick-action-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          <span>Upload Images</span>
+        </a>
+        <a href="/admin/posts/new" class="quick-action-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          <span>Write Blog Article</span>
+        </a>
+        <a href="/admin/pages" class="quick-action-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          <span>Edit Homepage Copy</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Dash Grid: Recent Products (Left) + Activity Stream (Right) -->
+    <div class="dash-main-grid">
+      <!-- Recent Products Panel -->
+      <div class="dash-panel editorial-card">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">RECENT PRODUCTS</h3>
+            <span class="panel-sub">Latest inventory units in the catalog</span>
+          </div>
+          <a href="/admin/products" class="btn btn-secondary btn-sm">
+            View All Products &rarr;
+          </a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>PREVIEW</th>
+                <th>MODEL NAME</th>
+                <th>CATEGORY</th>
+                <th>PRICE</th>
+                <th>STATUS</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="dash-recent-products-tbody">
+              {INITIAL_PRODUCTS.slice(0, 5).map((prod) => (
+                <tr>
+                  <td>
+                    <img
+                      src={prod.mainImage}
+                      alt={prod.name}
+                      class="table-thumb"
+                      onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=100&q=80'"
+                    />
+                  </td>
+                  <td>
+                    <a href={`/admin/products/${prod.id}`} class="table-title-link">
+                      {prod.name}
+                    </a>
+                  </td>
+                  <td><span class="badge badge-category">{prod.categoryName}</span></td>
+                  <td><strong>${prod.price.toLocaleString()}</strong></td>
+                  <td>
+                    <span class:list={['badge', prod.specifications.availability === 'In Stock' ? 'badge-stock' : 'badge-order']}>
+                      {prod.specifications.availability}
+                    </span>
+                  </td>
+                  <td>
+                    <a href={`/admin/products/${prod.id}`} class="table-action-btn" title="Edit Product">
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Activity Stream Panel -->
+      <div class="dash-panel editorial-card">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">AUDIT & ACTIVITY LOG</h3>
+            <span class="panel-sub">Recent local content revisions</span>
+          </div>
+        </div>
+
+        <div class="activity-timeline">
+          <div class="activity-item">
+            <div class="activity-icon-bullet bullet-edit"></div>
+            <div class="activity-details">
+              <span class="activity-event">Product Pricing Updated</span>
+              <p class="activity-desc">Enclosed Cargo 6×12 updated with tandem axle payload specs.</p>
+              <span class="activity-time">Just now</span>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon-bullet bullet-publish"></div>
+            <div class="activity-details">
+              <span class="activity-event">Technical Guide Published</span>
+              <p class="activity-desc">"How to Choose the Right Enclosed Trailer" live in journal collection.</p>
+              <span class="activity-time">2 hours ago</span>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon-bullet bullet-media"></div>
+            <div class="activity-details">
+              <span class="activity-event">Media Assets Synced</span>
+              <p class="activity-desc">5 high-definition commercial trailer photographs indexed in library.</p>
+              <span class="activity-time">Yesterday</span>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon-bullet bullet-config"></div>
+            <div class="activity-details">
+              <span class="activity-event">Global Settings Initialized</span>
+              <p class="activity-desc">Website name and contact placeholders configured for Serkan demonstration.</p>
+              <span class="activity-time">2 days ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<style>
+  .dash-overview-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Welcome Banner */
+  .dash-welcome-panel {
+    padding: 2rem 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    background-color: #FFFFFF;
+  }
+
+  .welcome-text-col {
+    max-width: 680px;
+  }
+
+  .welcome-heading {
+    font-size: 1.75rem;
+    margin: 0.25rem 0 0.5rem 0;
+  }
+
+  .welcome-sub {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .welcome-actions-col {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* Stats Grid */
+  .dash-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .dash-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .dash-stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .stat-card {
+    background-color: #FFFFFF;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  .stat-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-xs);
+    background-color: var(--color-pale-sand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-deep-charcoal);
+  }
+
+  .stat-number {
+    font-family: var(--font-mono);
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--color-deep-charcoal);
+  }
+
+  .stat-footnote {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* Quick Actions Strip */
+  .quick-actions-strip {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: #FFFFFF;
+    padding: 1rem 1.5rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    flex-wrap: wrap;
+  }
+
+  .strip-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .quick-btns-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .quick-action-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.75rem;
+    background-color: var(--color-pale-sand);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-full);
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .quick-action-pill:hover {
+    background-color: var(--color-forest-green);
+    color: var(--color-pure-white);
+    border-color: var(--color-forest-green);
+  }
+
+  /* Main Dash Grid */
+  .dash-main-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .dash-main-grid {
+      grid-template-columns: 1.6fr 1fr;
+    }
+  }
+
+  .dash-panel {
+    background-color: #FFFFFF;
+    padding: 1.75rem;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .panel-title {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .panel-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  /* Table */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .admin-table th, .admin-table td {
+    padding: 0.75rem 0.65rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .admin-table th {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .table-thumb {
+    width: 48px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: var(--radius-xs);
+    background-color: var(--color-pale-sand);
+  }
+
+  .table-title-link {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+  }
+  .table-title-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  .table-action-btn {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-xs);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .table-action-btn:hover {
+    background-color: var(--color-forest-green);
+    color: var(--color-pure-white);
+  }
+
+  /* Activity Timeline */
+  .activity-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .activity-item {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+  }
+
+  .activity-icon-bullet {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .bullet-edit { background-color: var(--color-forest-green); }
+  .bullet-publish { background-color: #2B6CB0; }
+  .bullet-media { background-color: var(--color-muted-copper); }
+  .bullet-config { background-color: #718096; }
+
+  .activity-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .activity-event {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+  }
+
+  .activity-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .activity-time {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  import { loadDemoState } from '../../utils/demo-state';
+
+  function hydrateDashboard() {
+    const state = loadDemoState();
+    const countTotal = document.getElementById('stat-total-products');
+    const countInStock = document.getElementById('stat-instock-products');
+    const countPosts = document.getElementById('stat-total-posts');
+    const tbody = document.getElementById('dash-recent-products-tbody');
+
+    if (countTotal) countTotal.textContent = String(state.products.length);
+    if (countInStock) {
+      countInStock.textContent = String(
+        state.products.filter((p) => p.specifications.availability === 'In Stock').length
+      );
+    }
+    if (countPosts) countPosts.textContent = String(state.articles.length);
+
+    if (tbody && state.products.length > 0) {
+      tbody.innerHTML = state.products.slice(0, 5).map((p) => `
+        <tr>
+          <td>
+            <img src="${p.mainImage}" alt="${p.name}" class="table-thumb" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=100&q=80'" />
+          </td>
+          <td>
+            <a href="/admin/products/${p.id}" class="table-title-link">${p.name}</a>
+          </td>
+          <td><span class="badge badge-category">${p.categoryName}</span></td>
+          <td><strong>$${(p.salePrice || p.price).toLocaleString()}</strong></td>
+          <td>
+            <span class="badge ${p.specifications.availability === 'In Stock' ? 'badge-stock' : 'badge-order'}">
+              ${p.specifications.availability}
+            </span>
+          </td>
+          <td>
+            <a href="/admin/products/${p.id}" class="table-action-btn">Edit</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', hydrateDashboard);
+  window.addEventListener('tc-demo-state-updated', hydrateDashboard);
+</script>

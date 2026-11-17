@@ -1,0 +1,596 @@
+---
+// src/pages/handover.astro
+import MainLayout from '../layouts/MainLayout.astro';
+import { getBreadcrumbSchema } from '../utils/schema';
+
+const breadcrumbs = [
+  { name: 'Home', url: '/' },
+  { name: 'Handover Documentation', url: '/handover' }
+];
+
+const breadcrumbSchema = getBreadcrumbSchema(breadcrumbs);
+---
+
+<MainLayout
+  title="Client Handover & Architecture Guide | Trailer Commerce"
+  description="Comprehensive technical handover guide for client Serkan covering Astro architecture, Claude Code workflows, Cloudflare deployment, and Payload CMS production roadmap."
+  canonical="/handover"
+  jsonLdSchema={[breadcrumbSchema]}
+>
+  <div class="handover-page-wrapper">
+    <!-- Header -->
+    <header class="handover-hero">
+      <div class="container">
+        <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+          <ol class="breadcrumb-list">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-separator">/</li>
+            <li class="breadcrumb-item is-current" aria-current="page">Handover Guide</li>
+          </ol>
+        </nav>
+
+        <div class="handover-hero-content">
+          <span class="eyebrow eyebrow-forest">CLIENT HANDOVER & ARCHITECTURE SPECIFICATION</span>
+          <h1 class="handover-title">TECHNICAL HANDOVER & DEPLOYMENT GUIDE</h1>
+          <p class="handover-lead">
+            Prepared specifically for client <strong>Serkan</strong>. This reference document details the project structure, how to edit content using <strong>Claude Code</strong>, the <strong>Cloudflare</strong> deployment pipeline, and the step-by-step roadmap to integrate full <strong>Payload CMS</strong> production services.
+          </p>
+          <div class="handover-badge-strip">
+            <span class="badge badge-stock">Frontend Prototype Live</span>
+            <span class="badge badge-category">Astro 5 + TypeScript</span>
+            <span class="badge badge-category">Cloudflare Edge Architecture</span>
+            <span class="badge badge-order">Payload CMS Migration Blueprint</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Grid with Sticky Sidebar Navigation -->
+    <div class="container handover-body-container">
+      <div class="handover-layout-grid">
+        <!-- Sticky Navigation Index -->
+        <aside class="handover-nav-sidebar" aria-label="Documentation navigation">
+          <div class="sticky-nav-box editorial-card">
+            <span class="nav-index-title">DOCUMENTATION SECTIONS</span>
+            <ul class="nav-index-list">
+              <li><a href="#section-arch" class="nav-idx-link">A. Architecture & Stack</a></li>
+              <li><a href="#section-repo" class="nav-idx-link">B. Repository Structure</a></li>
+              <li><a href="#section-claude" class="nav-idx-link">C. Claude Code Editing Guide</a></li>
+              <li><a href="#section-cloudflare" class="nav-idx-link">D. Cloudflare Deployment</a></li>
+              <li><a href="#section-cms" class="nav-idx-link">E. Content Management Workflows</a></li>
+              <li><a href="#section-media" class="nav-idx-link">F. Media & Image Management</a></li>
+              <li><a href="#section-troubleshooting" class="nav-idx-link">G. Common Troubleshooting</a></li>
+              <li><a href="#section-future" class="nav-idx-link">H. Production Backend Integration</a></li>
+            </ul>
+
+            <div class="sidebar-cta-box">
+              <span class="cta-box-label">LIVE DEMO ACCESS</span>
+              <a href="/admin/login" class="btn btn-primary btn-sm btn-block">
+                Open CMS Admin &rarr;
+              </a>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Documentation Body -->
+        <main class="handover-prose-col">
+          <!-- Section A: Architecture -->
+          <section id="section-arch" class="doc-card editorial-card">
+            <span class="doc-badge">SECTION A</span>
+            <h2 class="doc-section-heading">Project Architecture & Technology Stack</h2>
+            <p>
+              The replacement for your legacy WordPress installation is built on a modern decoupled headless architecture. This eliminates WordPress database vulnerabilities, slow plugin bloat, and rigid template constraints:
+            </p>
+
+            <div class="architecture-specs-grid">
+              <div class="arch-box">
+                <span class="arch-tech-title">Astro (v5)</span>
+                <p class="arch-tech-desc">Provides ultra-fast static pre-rendering, modern component scoping, zero unused JavaScript shipped to clients, and native SEO JSON-LD injection.</p>
+              </div>
+              <div class="arch-box">
+                <span class="arch-tech-title">TypeScript & Modern CSS</span>
+                <p class="arch-tech-desc">Type-safe data contracts for products, specifications, and articles. Pure CSS custom properties matching your automotive editorial aesthetic without heavy utility framework overhead.</p>
+              </div>
+              <div class="arch-box">
+                <span class="arch-tech-title">Cloudflare Edge Hosting</span>
+                <p class="arch-tech-desc">Global CDN distribution across 300+ data centers. Delivers sub-100ms TTFB worldwide, automatic SSL, DDoS defense, and instant edge asset caching.</p>
+              </div>
+              <div class="arch-box">
+                <span class="arch-tech-title">Payload CMS (Target Backend)</span>
+                <p class="arch-tech-desc">TypeScript-first headless CMS. In this demonstration, simulated with reactive HTML5 local storage so you can test adding and editing inventory immediately.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section B: Repository Structure -->
+          <section id="section-repo" class="doc-card editorial-card">
+            <span class="doc-badge">SECTION B</span>
+            <h2 class="doc-section-heading">Repository Structure</h2>
+            <p>The codebase is organized into cleanly separated domains:</p>
+
+            <pre class="code-block font-mono"><code>trailer-commerce/
+├── CLAUDE.md                    # Project guidelines & Claude Code prompt prompts
+├── README.md                    # Quickstart & build documentation
+├── astro.config.mjs             # Astro compilation & static build config
+├── wrangler.toml                # Cloudflare Pages / Workers deployment config
+├── tsconfig.json                # TypeScript compiler strict definitions
+├── public/
+│   ├── favicon.svg              # Brand automotive logo emblem
+│   ├── robots.txt               # Search engine crawl rules
+│   └── sitemap.xml              # XML search index sitemap
+├── docs/
+│   ├── architecture.md          # Technical architectural breakdown
+│   ├── admin-guide.md           # CMS administration operating guide
+│   └── cloudflare-deployment.md # Deployment procedures
+├── payload/
+│   └── README.md                # Production Payload CMS migration schema
+└── src/
+    ├── components/              # Header, Footer, Modals, Cards, Lightbox
+    ├── data/                    # Products, Categories, Articles, Content
+    ├── layouts/                 # MainLayout (Storefront) & AdminLayout (CMS)
+    ├── pages/                   # All public routes + /admin routes
+    ├── styles/                  # Brand tokens (variables.css) & global styles
+    └── utils/                   # Shared demo state, SEO formatters, Schemas</code></pre>
+          </section>
+
+          <!-- Section C: Editing via Claude Code -->
+          <section id="section-repo" class="doc-card editorial-card">
+            <span class="doc-badge">SECTION C</span>
+            <h2 class="doc-section-heading">Editing Static Content through Claude Code</h2>
+            <p>
+              Claude Code enables you to adjust copy, headings, and design tokens using natural language instructions. Below are exact prompt examples you can paste directly into Claude Code:
+            </p>
+
+            <div class="claude-recipe-box">
+              <h4 class="recipe-title">1. Changing the Homepage Headline</h4>
+              <p class="recipe-expl">Prompt to give Claude Code:</p>
+              <div class="prompt-snippet font-mono">
+                "In src/data/site-content.ts, update the homepage heroHeadline to 'PRECISION HAULING. BUILT FOR THE LONG RUN.' and update the heroDescription to reflect our new commercial fleet guarantee."
+              </div>
+            </div>
+
+            <div class="claude-recipe-box">
+              <h4 class="recipe-title">2. Updating the About Page Introduction</h4>
+              <p class="recipe-expl">Prompt to give Claude Code:</p>
+              <div class="prompt-snippet font-mono">
+                "In src/data/site-content.ts, update about.introParagraph to mention our 24-point pre-delivery inspection protocol and highlight our warranty on Dexter axles."
+              </div>
+            </div>
+
+            <div class="claude-recipe-box">
+              <h4 class="recipe-title">3. Editing Footer Links & Phone Numbers</h4>
+              <p class="recipe-expl">Prompt to give Claude Code:</p>
+              <div class="prompt-snippet font-mono">
+                "In src/data/site-content.ts and src/components/Footer.astro, update the customer service telephone number to (555) 789-0123 and add a direct link to the Warranty Guide."
+              </div>
+            </div>
+
+            <div class="claude-recipe-box">
+              <h4 class="recipe-title">4. Adding or Adjusting Navigation Links</h4>
+              <p class="recipe-expl">Prompt to give Claude Code:</p>
+              <div class="prompt-snippet font-mono">
+                "In src/components/Header.astro, add a new top-level navigation item titled 'FINANCING' pointing to '/financing' with smooth hover underline animations."
+              </div>
+            </div>
+          </section>
+
+          <!-- Section D: Cloudflare Deployment -->
+          <section id="section-cloudflare" class="doc-card editorial-card">
+            <span class="doc-badge">SECTION D</span>
+            <h2 class="doc-section-heading">Intended Cloudflare Deployment Workflow</h2>
+            <p>
+              Deploying updates to your live Cloudflare environment follows an automated, continuous delivery model. The configuration is pre-configured in <code>wrangler.toml</code>:
+            </p>
+
+            <div class="step-workflow-list">
+              <div class="workflow-step">
+                <span class="step-badge">STEP 1</span>
+                <div>
+                  <strong>Edit Locally & Preview:</strong>
+                  <p>Run <code>npm run dev</code> in your terminal to review changes at <code>http://localhost:4321</code> with instant Hot Module Reloading.</p>
+                </div>
+              </div>
+
+              <div class="workflow-step">
+                <span class="step-badge">STEP 2</span>
+                <div>
+                  <strong>Build Production Verification:</strong>
+                  <p>Execute <code>npm run build</code>. Astro runs full TypeScript verification and pre-renders static HTML into the <code>dist/</code> directory.</p>
+                </div>
+              </div>
+
+              <div class="workflow-step">
+                <span class="step-badge">STEP 3</span>
+                <div>
+                  <strong>Commit & Push to Git:</strong>
+                  <p>Commit your revisions: <code>git add . && git commit -m "Update trailer pricing" && git push origin main</code>.</p>
+                </div>
+              </div>
+
+              <div class="workflow-step">
+                <span class="step-badge">STEP 4</span>
+                <div>
+                  <strong>Automated Cloudflare Pages Deployment:</strong>
+                  <p>Cloudflare Pages automatically detects the Git push, pulls the repository, executes the build command, and deploys globally in under 45 seconds.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section E: CMS Workflows -->
+          <section id="section-cms" class="doc-card editorial-card">
+            <span class="doc-badge">SECTION E</span>
+            <h2 class="doc-section-heading">Payload CMS Content Management Workflows</h2>
+            <p>
+              In this interactive demonstration, the CMS is operational right now inside your browser. Here is how to perform common tasks:
+            </p>
+
+            <ul class="doc-bullet-list">
+              <li><strong>Sign In:</strong> Navigate to <a href="/admin/login" class="link-inline">/admin/login</a>. Use demo email <code>admin@trailercommerce.demo</code> and password <code>TrailerDemo123!</code> (or click the <em>Auto-Fill</em> shortcut).</li>
+              <li><strong>Editing a Product:</strong> Open <a href="/admin/products" class="link-inline">/admin/products</a>, click "Edit" on any trailer (such as the <em>Enclosed Cargo 6×12</em>). You can change the price, edit dimensions, update the description, or replace the photo. Click <strong>Save Changes</strong>. When you return to the storefront, your changes appear instantly!</li>
+              <li><strong>Adding New Inventory:</strong> Click <strong>+ Add New Trailer</strong> at <a href="/admin/products/new" class="link-inline">/admin/products/new</a>. Fill out model name, category, price, and specs. Upon clicking Publish, the trailer joins the live catalogue and filter drawer.</li>
+              <li><strong>Google Search Preview:</strong> Inside the product editor, watch the real-time Google search snippet update as you type. Character counters guide optimal length for meta titles and descriptions.</li>
+              <li><strong>Publishing Journal Articles:</strong> Access <a href="/admin/posts/new" class="link-inline">/admin/posts/new</a>. Use formatting buttons (Bold, Italic, Headings, Lists) to compose educational posts.</li>
+            </ul>
+          </section>
+
+          <!-- Section F: Media -->
+          <section id="section-media" class="doc-card editorial-card">
+            <span class="doc-badge">SECTION F</span>
+            <h2 class="doc-section-heading">Media & Image Management</h2>
+            <p>
+              High quality commercial photography is essential for trailer sales. Inside <a href="/admin/media" class="link-inline">/admin/media</a>, you can:
+            </p>
+            <ul class="doc-bullet-list">
+              <li>Drag and drop images directly into the upload canvas to create instant browser previews.</li>
+              <li>Inspect dimensions, file sizes, and edit SEO alt-text tags for each image.</li>
+              <li>Copy image URLs into any product card to instantly update photography on the storefront.</li>
+            </ul>
+          </section>
+
+          <!-- Section G: Troubleshooting -->
+          <section id="section-troubleshooting" class="doc-card editorial-card">
+            <span class="doc-badge">SECTION G</span>
+            <h2 class="doc-section-heading">Troubleshooting & Best Practices</h2>
+            <div class="trouble-item">
+              <strong>Q: How do I undo test edits made during client testing?</strong>
+              <p>Navigate to <a href="/admin/settings" class="link-inline">/admin/settings</a> and click "Reset All Data to Factory Seed Defaults". This clears local storage and restores pristine initial data.</p>
+            </div>
+            <div class="trouble-item">
+              <strong>Q: What happens if a remote photography link becomes unreachable?</strong>
+              <p>Every product card, detail page, and category hero contains a built-in graceful fallback handler (<code>onerror</code>) that loads a high-res neutral trailer photograph rather than showing a broken icon.</p>
+            </div>
+          </section>
+
+          <!-- Section H: Production Roadmap -->
+          <section id="section-future" class="doc-card editorial-card">
+            <span class="doc-badge">SECTION H</span>
+            <h2 class="doc-section-heading">Production Backend Integration Roadmap</h2>
+            <p>
+              To advance from this interactive frontend demonstration to a full production deployment with live database persistence and multi-user authentication:
+            </p>
+
+            <ol class="doc-num-list">
+              <li>
+                <strong>Provision Cloudflare D1 or PostgreSQL Database:</strong>
+                <p>Deploy a managed serverless database (Cloudflare D1, Neon, or Supabase) to hold persistent records for products, orders, and customer leads.</p>
+              </li>
+              <li>
+                <strong>Deploy Node.js / Cloudflare Worker Payload CMS Instance:</strong>
+                <p>Initialize the official Payload CMS package using the schema models documented in <code>payload/README.md</code>. Set up JWT authentication and Argon2 password hashing.</p>
+              </li>
+              <li>
+                <strong>Configure Cloudflare R2 Media Bucket:</strong>
+                <p>Attach Cloudflare R2 (S3-compatible object storage) for uploading high-resolution trailer photos and PDF spec sheets with zero egress fees.</p>
+              </li>
+              <li>
+                <strong>Connect Astro ISR / Edge Adapters:</strong>
+                <p>Configure <code>@astrojs/cloudflare</code> SSR adapter with Incremental Static Regeneration (ISR) so that whenever you publish a product in Payload CMS, the corresponding Astro page re-renders on the edge in seconds.</p>
+              </li>
+            </ol>
+
+            <div class="doc-cta-banner">
+              <h3 class="banner-title">Ready to Move Forward with Production?</h3>
+              <p class="banner-sub">
+                This demonstration proves the design quality, interactive speed, and intuitive management interface. Contact our team to begin the production rollout.
+              </p>
+              <a href="/contact" class="btn btn-primary">
+                Discuss Production Integration &rarr;
+              </a>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .handover-page-wrapper {
+    padding-bottom: 6rem;
+  }
+
+  .handover-hero {
+    background-color: var(--color-pale-sand);
+    border-bottom: 1px solid var(--border-medium);
+    padding: clamp(2.5rem, 5vw, 4.5rem) 0;
+  }
+
+  .handover-title {
+    margin: 0.4rem 0 0.85rem 0;
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+  }
+
+  .handover-lead {
+    max-width: 820px;
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+  }
+
+  .handover-badge-strip {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* Body Layout */
+  .handover-body-container {
+    padding-top: 3rem;
+  }
+
+  .handover-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  @media (min-width: 992px) {
+    .handover-layout-grid {
+      grid-template-columns: 280px 1fr;
+    }
+  }
+
+  /* Sticky Sidebar */
+  .sticky-nav-box {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+    background-color: #FFFFFF;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .nav-index-title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .nav-index-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .nav-idx-link {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+  }
+
+  .nav-idx-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  .sidebar-cta-box {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .cta-box-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  /* Prose Column */
+  .handover-prose-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    max-width: 840px;
+  }
+
+  .doc-card {
+    background-color: #FFFFFF;
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .doc-badge {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-muted-copper);
+  }
+
+  .doc-section-heading {
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .architecture-specs-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  @media (min-width: 600px) {
+    .architecture-specs-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .arch-box {
+    background-color: var(--color-pale-sand);
+    padding: 1.25rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+  }
+
+  .arch-tech-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .arch-tech-desc {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .code-block {
+    background-color: var(--color-deep-charcoal);
+    color: var(--color-warm-ivory);
+    padding: 1.25rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  /* Claude Recipes */
+  .claude-recipe-box {
+    background-color: var(--color-pale-sand);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+  }
+
+  .recipe-title {
+    font-size: 1.05rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .recipe-expl {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .prompt-snippet {
+    background-color: #FFFFFF;
+    border-left: 3px solid var(--color-forest-green);
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem;
+    color: var(--color-deep-charcoal);
+    border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  }
+
+  /* Workflow Steps */
+  .step-workflow-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .workflow-step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    background-color: var(--color-pale-sand);
+    border-radius: var(--radius-sm);
+  }
+
+  .step-badge {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    background-color: var(--color-forest-green);
+    color: #FFFFFF;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-xs);
+    flex-shrink: 0;
+  }
+
+  .doc-bullet-list, .doc-num-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding-left: 1.25rem;
+  }
+
+  .doc-bullet-list li, .doc-num-list li {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-deep-charcoal);
+  }
+
+  .link-inline {
+    color: var(--color-forest-green);
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  .trouble-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .trouble-item strong {
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .trouble-item p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .doc-cta-banner {
+    background-color: var(--color-pale-sand);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .banner-title {
+    font-size: 1.35rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .banner-sub {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    max-width: 540px;
+    margin: 0 auto 1.5rem auto;
+    line-height: 1.55;
+  }
+</style>

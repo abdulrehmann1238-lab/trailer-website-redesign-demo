@@ -1,0 +1,360 @@
+---
+// ProductCard.astro
+import type { Product } from '../data/products';
+
+interface Props {
+  product: Product;
+  featured?: boolean;
+}
+
+const { product, featured = false } = Astro.props;
+---
+<article
+  class:list={['product-card', 'editorial-card', { 'is-featured-card': featured }]}
+  data-product-id={product.id}
+  data-slug={product.slug}
+  data-category={product.category}
+  data-price={product.price}
+  data-axles={product.specifications.axles}
+  data-availability={product.specifications.availability}
+>
+  <!-- Card Media -->
+  <div class="card-media-wrap img-container">
+    <a href={`/product/${product.slug}`} class="card-img-link" aria-label={`View ${product.name} specifications`}>
+      <img
+        src={product.mainImage}
+        alt={product.name}
+        loading="lazy"
+        class="card-img product-live-img"
+        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80';"
+      />
+    </a>
+
+    <!-- Badges -->
+    <div class="card-badges">
+      <span class="badge badge-category product-live-category">{product.categoryName}</span>
+      {product.specifications.availability === 'In Stock' ? (
+        <span class="badge badge-stock product-live-avail">In Stock</span>
+      ) : (
+        <span class="badge badge-order product-live-avail">{product.specifications.availability}</span>
+      )}
+    </div>
+
+    <!-- Quick Actions Floating on Image -->
+    <div class="card-floating-actions">
+      <button
+        type="button"
+        class="quick-view-btn"
+        data-qv-id={product.id}
+        title="Quick Specifications"
+        aria-label={`Quick view ${product.name}`}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <span>QUICK VIEW</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Card Body -->
+  <div class="card-body">
+    <div class="card-header-row">
+      <h3 class="card-title">
+        <a href={`/product/${product.slug}`} class="card-title-link product-live-name">
+          {product.name}
+        </a>
+      </h3>
+      <div class="card-price-wrap">
+        {product.salePrice ? (
+          <div class="sale-price-group">
+            <span class="price-strikethrough">${product.price.toLocaleString()}</span>
+            <span class="price-val product-live-price">${product.salePrice.toLocaleString()}</span>
+          </div>
+        ) : (
+          <span class="price-val product-live-price">${product.price.toLocaleString()}</span>
+        )}
+      </div>
+    </div>
+
+    <p class="card-desc product-live-desc">
+      {product.shortDescription}
+    </p>
+
+    <!-- Key Spec Strip -->
+    <div class="spec-pills-strip">
+      <div class="spec-pill" title="Deck Dimensions">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <span class="spec-pill-text product-live-dim">{product.specifications.dimensions}</span>
+      </div>
+      <div class="spec-pill" title="Payload Rating">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+        </svg>
+        <span class="spec-pill-text product-live-cap">{product.specifications.capacity}</span>
+      </div>
+    </div>
+
+    <!-- Card Footer -->
+    <div class="card-footer-row">
+      <a href={`/product/${product.slug}`} class="btn btn-secondary btn-sm card-view-btn">
+        VIEW DETAILS
+      </a>
+
+      <!-- Compare Toggle Button -->
+      <button
+        type="button"
+        class="card-compare-btn"
+        data-compare-id={product.id}
+        title="Add to side-by-side comparison"
+        aria-label={`Compare ${product.name}`}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 3h5v5"></path>
+          <path d="M4 20L21 3"></path>
+          <path d="M21 16v5h-5"></path>
+          <path d="M15 15l6 6"></path>
+          <path d="M4 4l5 5"></path>
+        </svg>
+        <span>COMPARE</span>
+      </button>
+    </div>
+  </div>
+</article>
+
+<style>
+  .product-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    background-color: var(--color-pure-white);
+  }
+
+  .card-media-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+
+  .card-img-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+
+  .product-card:hover .card-img {
+    transform: scale(1.04);
+  }
+
+  .card-badges {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .card-floating-actions {
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: all var(--transition-base);
+    z-index: 3;
+  }
+
+  .product-card:hover .card-floating-actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .quick-view-btn {
+    background-color: rgba(37, 39, 36, 0.88);
+    backdrop-filter: blur(4px);
+    color: var(--color-warm-ivory);
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: 0.35rem 0.65rem;
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background-color var(--transition-fast);
+  }
+
+  .quick-view-btn:hover {
+    background-color: var(--color-forest-green);
+  }
+
+  .card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.85rem;
+  }
+
+  .card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  .card-title-link {
+    color: var(--color-deep-charcoal);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .card-title-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  .card-price-wrap {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .price-val {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+  }
+
+  .sale-price-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .price-strikethrough {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+
+  .card-desc {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .spec-pills-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+  }
+
+  .spec-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--color-pale-sand);
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-deep-charcoal);
+  }
+
+  .card-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .card-view-btn {
+    flex: 1;
+  }
+
+  .card-compare-btn {
+    background: transparent;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.65rem;
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .card-compare-btn:hover {
+    background-color: var(--color-forest-green);
+    border-color: var(--color-forest-green);
+    color: var(--color-pure-white);
+  }
+</style>
+
+<script>
+  // Delegate Quick View & Compare Clicks
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+
+    // Quick View click
+    const qvBtn = target.closest('.quick-view-btn') as HTMLElement;
+    if (qvBtn) {
+      e.preventDefault();
+      const id = qvBtn.dataset.qvId;
+      if (id) {
+        window.dispatchEvent(new CustomEvent('tc-open-quickview', { detail: { id } }));
+      }
+      return;
+    }
+
+    // Compare click
+    const compareBtn = target.closest('.card-compare-btn') as HTMLElement;
+    if (compareBtn) {
+      e.preventDefault();
+      const id = compareBtn.dataset.compareId;
+      if (id) {
+        window.dispatchEvent(new CustomEvent('tc-add-to-compare', { detail: { id } }));
+      }
+      return;
+    }
+  });
+</script>

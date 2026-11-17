@@ -1,0 +1,734 @@
+---
+// Header.astro
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = Astro.url.pathname } = Astro.props;
+
+const isActive = (path: string) => {
+  if (path === '/' && currentPath === '/') return true;
+  if (path !== '/' && currentPath.startsWith(path)) return true;
+  return false;
+};
+---
+<header id="site-header" class="site-header">
+  <div class="container-wide header-inner">
+    <!-- Brand Logo -->
+    <a href="/" class="header-logo" aria-label="Trailer Commerce - Return to homepage">
+      <div class="logo-mark">
+        <svg viewBox="0 0 48 48" fill="none" class="logo-svg" aria-hidden="true">
+          <rect width="48" height="48" rx="8" fill="#26372F"/>
+          <path d="M12 28L18 16H36L30 28H12Z" fill="#F5F3ED"/>
+          <circle cx="19" cy="33" r="3.5" fill="#A66E4D"/>
+          <circle cx="29" cy="33" r="3.5" fill="#A66E4D"/>
+          <path d="M36 24H40" stroke="#F5F3ED" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-brand">TRAILER COMMERCE</span>
+        <span class="logo-tag">BUILT FOR THE JOURNEY</span>
+      </div>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="/" class:list={['nav-link', { 'is-active': isActive('/') }]}>
+            HOME
+          </a>
+        </li>
+        <li class="nav-item has-dropdown">
+          <a
+            href="/trailers"
+            class:list={['nav-link', 'dropdown-trigger', { 'is-active': isActive('/trailers') }]}
+            aria-expanded="false"
+            aria-haspopup="true"
+          >
+            TRAILERS
+            <svg class="dropdown-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <div class="dropdown-menu" role="menu">
+            <div class="dropdown-grid">
+              <div class="dropdown-column">
+                <span class="dropdown-header">CATEGORIES</span>
+                <a href="/trailers/enclosed-trailers" class="dropdown-item" role="menuitem">
+                  <span class="item-title">Enclosed Trailers</span>
+                  <span class="item-sub">Weatherproof secure cargo haulers</span>
+                </a>
+                <a href="/trailers/utility-trailers" class="dropdown-item" role="menuitem">
+                  <span class="item-title">Utility Trailers</span>
+                  <span class="item-sub">Open-deck landscaping and DIY equipment</span>
+                </a>
+                <a href="/trailers/flatbed-trailers" class="dropdown-item" role="menuitem">
+                  <span class="item-title">Flatbed Trailers</span>
+                  <span class="item-sub">Heavy vehicle and machinery transport</span>
+                </a>
+                <a href="/trailers/cargo-trailers" class="dropdown-item" role="menuitem">
+                  <span class="item-title">Cargo Trailers</span>
+                  <span class="item-sub">Aerodynamic high-cube commercial freight</span>
+                </a>
+                <a href="/trailers/horse-trailers" class="dropdown-item" role="menuitem">
+                  <span class="item-title">Horse Trailers</span>
+                  <span class="item-sub">Padded equestrian transport with torsion ride</span>
+                </a>
+              </div>
+              <div class="dropdown-footer">
+                <a href="/trailers" class="dropdown-view-all">
+                  VIEW ALL TRAILERS
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8H13M13 8L8.5 3.5M13 8L8.5 12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a href="/about" class:list={['nav-link', { 'is-active': isActive('/about') }]}>
+            ABOUT
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/blog" class:list={['nav-link', { 'is-active': isActive('/blog') }]}>
+            JOURNAL
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/contact" class:list={['nav-link', { 'is-active': isActive('/contact') }]}>
+            CONTACT
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <!-- Search Button -->
+      <button id="search-trigger-btn" class="action-btn" aria-label="Open search catalogue" title="Search trailers (Press /)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+
+      <!-- Compare Trigger -->
+      <button id="header-compare-btn" class="action-btn compare-action-btn" aria-label="View trailer comparison" title="Compare trailers">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 3h5v5"></path>
+          <path d="M4 20L21 3"></path>
+          <path d="M21 16v5h-5"></path>
+          <path d="M15 15l6 6"></path>
+          <path d="M4 4l5 5"></path>
+        </svg>
+        <span id="header-compare-count" class="badge-count" style="display: none;">0</span>
+      </button>
+
+      <!-- Enquire CTA Button -->
+      <button id="open-enquiry-modal-btn" class="btn btn-primary btn-sm header-enquire-btn">
+        ENQUIRE
+      </button>
+
+      <!-- Mobile Hamburger Button -->
+      <button id="mobile-menu-toggle" class="mobile-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Drawer -->
+  <div id="mobile-drawer" class="mobile-drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <span class="drawer-logo">TRAILER COMMERCE</span>
+      <button id="mobile-drawer-close" class="drawer-close" aria-label="Close navigation menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <ul class="mobile-nav-list">
+        <li><a href="/" class="mobile-nav-link">HOME</a></li>
+        <li class="mobile-accordion">
+          <button class="mobile-accordion-trigger" aria-expanded="false">
+            TRAILERS
+            <svg class="accordion-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="mobile-accordion-content">
+            <a href="/trailers" class="mobile-sub-link">All Trailers</a>
+            <a href="/trailers/enclosed-trailers" class="mobile-sub-link">Enclosed Trailers</a>
+            <a href="/trailers/utility-trailers" class="mobile-sub-link">Utility Trailers</a>
+            <a href="/trailers/flatbed-trailers" class="mobile-sub-link">Flatbed Trailers</a>
+            <a href="/trailers/cargo-trailers" class="mobile-sub-link">Cargo Trailers</a>
+            <a href="/trailers/horse-trailers" class="mobile-sub-link">Horse Trailers</a>
+          </div>
+        </li>
+        <li><a href="/about" class="mobile-nav-link">ABOUT</a></li>
+        <li><a href="/blog" class="mobile-nav-link">JOURNAL</a></li>
+        <li><a href="/contact" class="mobile-nav-link">CONTACT</a></li>
+        <li><a href="/handover" class="mobile-nav-link handover-link">HANDOVER GUIDE</a></li>
+        <li><a href="/admin/login" class="mobile-nav-link admin-link">CMS ADMIN DEMO</a></li>
+      </ul>
+      <div class="drawer-footer">
+        <button id="mobile-enquire-btn" class="btn btn-primary btn-block">
+          TALK TO OUR TEAM
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="drawer-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    background-color: rgba(245, 243, 237, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 1000;
+    border-bottom: 1px solid var(--border-light);
+    transition: background-color var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  }
+
+  .site-header.is-scrolled {
+    background-color: rgba(245, 243, 237, 0.98);
+    box-shadow: 0 4px 20px rgba(37, 39, 36, 0.06);
+    border-bottom-color: var(--border-medium);
+  }
+
+  .header-inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  /* Brand Logo */
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .logo-mark {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+  }
+
+  .logo-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-brand {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--color-deep-charcoal);
+    line-height: 1.1;
+  }
+
+  .logo-tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--color-muted-copper);
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  /* Desktop Nav */
+  .desktop-nav {
+    display: none;
+  }
+
+  @media (min-width: 992px) {
+    .desktop-nav {
+      display: block;
+    }
+  }
+
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-item {
+    position: relative;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--color-deep-charcoal);
+    padding: 0.5rem 0;
+    position: relative;
+    transition: color var(--transition-fast);
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background-color: var(--color-forest-green);
+    transition: width var(--transition-base);
+  }
+
+  .nav-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  .nav-link:hover::after,
+  .nav-link.is-active::after {
+    width: 100%;
+  }
+
+  .nav-link.is-active {
+    color: var(--color-forest-green);
+  }
+
+  /* Dropdown Menu */
+  .dropdown-chevron {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--transition-fast);
+  }
+
+  .has-dropdown:hover .dropdown-chevron,
+  .has-dropdown:focus-within .dropdown-chevron {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: -20px;
+    width: 340px;
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-elevated);
+    padding: 1.25rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all var(--transition-base);
+    pointer-events: none;
+    z-index: 1050;
+  }
+
+  .has-dropdown:hover .dropdown-menu,
+  .has-dropdown:focus-within .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .dropdown-header {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .dropdown-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background-color var(--transition-fast);
+  }
+
+  .dropdown-item:hover {
+    background-color: var(--color-pale-sand);
+  }
+
+  .item-title {
+    font-family: var(--font-heading);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-deep-charcoal);
+  }
+
+  .item-sub {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+  }
+
+  .dropdown-footer {
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .dropdown-view-all {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+    padding: 0.35rem 0.65rem;
+  }
+
+  .dropdown-view-all:hover {
+    text-decoration: underline;
+  }
+
+  /* Header Actions */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .action-btn {
+    background: transparent;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-deep-charcoal);
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition-fast);
+  }
+
+  .action-btn:hover {
+    background-color: var(--color-pale-sand);
+    border-color: var(--color-deep-charcoal);
+    color: var(--color-forest-green);
+  }
+
+  .badge-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--color-muted-copper);
+    color: var(--color-pure-white);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-enquire-btn {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .header-enquire-btn {
+      display: inline-flex;
+    }
+  }
+
+  /* Mobile Toggle */
+  .mobile-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 38px;
+    height: 38px;
+    background: transparent;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    padding: 9px 8px;
+    cursor: pointer;
+  }
+
+  @media (min-width: 992px) {
+    .mobile-toggle {
+      display: none;
+    }
+  }
+
+  .hamburger-bar {
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-deep-charcoal);
+    border-radius: 2px;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+  }
+
+  /* Mobile Drawer */
+  .mobile-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(340px, 85vw);
+    height: 100vh;
+    background-color: var(--color-warm-ivory);
+    box-shadow: -8px 0 30px rgba(37, 39, 36, 0.15);
+    z-index: 2000;
+    transform: translateX(100%);
+    transition: transform var(--transition-base);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .mobile-drawer.is-open {
+    transform: translateX(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .drawer-logo {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: var(--color-deep-charcoal);
+  }
+
+  .drawer-close {
+    background: transparent;
+    border: none;
+    color: var(--color-deep-charcoal);
+    cursor: pointer;
+    padding: 0.25rem;
+  }
+
+  .drawer-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    flex: 1;
+  }
+
+  .mobile-nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .mobile-nav-link {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .mobile-nav-link.handover-link {
+    color: var(--color-muted-copper);
+  }
+
+  .mobile-nav-link.admin-link {
+    color: var(--color-forest-green);
+  }
+
+  .mobile-accordion-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+    background: transparent;
+    border: none;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+  }
+
+  .mobile-accordion-content {
+    display: none;
+    padding: 0.5rem 0 0.5rem 1rem;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .mobile-accordion.is-open .mobile-accordion-content {
+    display: flex;
+  }
+
+  .mobile-accordion.is-open .accordion-chevron {
+    transform: rotate(180deg);
+  }
+
+  .mobile-sub-link {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    padding: 0.35rem 0;
+  }
+
+  .btn-block {
+    width: 100%;
+  }
+
+  .drawer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(37, 39, 36, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 1999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+  }
+
+  .drawer-backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
+
+<script>
+  // Sticky header scroll behavior
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    if (!header) return;
+    if (window.scrollY > 20) {
+      header.classList.add('is-scrolled');
+    } else {
+      header.classList.remove('is-scrolled');
+    }
+  }, { passive: true });
+
+  // Mobile drawer interaction
+  const toggleBtn = document.getElementById('mobile-menu-toggle');
+  const closeBtn = document.getElementById('mobile-drawer-close');
+  const drawer = document.getElementById('mobile-drawer');
+  const backdrop = document.getElementById('drawer-backdrop');
+
+  function openDrawer() {
+    drawer?.classList.add('is-open');
+    backdrop?.classList.add('is-open');
+    drawer?.setAttribute('aria-hidden', 'false');
+    backdrop?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    drawer?.classList.remove('is-open');
+    backdrop?.classList.remove('is-open');
+    drawer?.setAttribute('aria-hidden', 'true');
+    backdrop?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  toggleBtn?.addEventListener('click', openDrawer);
+  closeBtn?.addEventListener('click', closeDrawer);
+  backdrop?.addEventListener('click', closeDrawer);
+
+  // Mobile accordion toggle
+  const accordionTrigger = document.querySelector('.mobile-accordion-trigger');
+  accordionTrigger?.addEventListener('click', () => {
+    const parent = accordionTrigger.closest('.mobile-accordion');
+    const isExpanded = accordionTrigger.getAttribute('aria-expanded') === 'true';
+    accordionTrigger.setAttribute('aria-expanded', String(!isExpanded));
+    parent?.classList.toggle('is-open');
+  });
+
+  // Mobile enquire button
+  document.getElementById('mobile-enquire-btn')?.addEventListener('click', () => {
+    closeDrawer();
+    window.dispatchEvent(new CustomEvent('open-enquiry-modal', { detail: { product: '' } }));
+  });
+
+  // Desktop enquire button
+  document.getElementById('open-enquiry-modal-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-enquiry-modal', { detail: { product: '' } }));
+  });
+
+  // Search button
+  document.getElementById('search-trigger-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-search-modal'));
+  });
+
+  // Compare tray toggle button
+  document.getElementById('header-compare-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('toggle-compare-tray'));
+  });
+
+  // Update compare count badge from localStorage / events
+  function updateHeaderCompareBadge() {
+    try {
+      const raw = localStorage.getItem('trailer_commerce_demo_state_v2');
+      if (raw) {
+        const state = JSON.parse(raw);
+        const count = state.comparedProductIds?.length || 0;
+        const badge = document.getElementById('header-compare-count');
+        if (badge) {
+          if (count > 0) {
+            badge.style.display = 'flex';
+            badge.textContent = String(count);
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
+  window.addEventListener('tc-demo-state-updated', updateHeaderCompareBadge);
+  window.addEventListener('storage', updateHeaderCompareBadge);
+  document.addEventListener('DOMContentLoaded', updateHeaderCompareBadge);
+</script>

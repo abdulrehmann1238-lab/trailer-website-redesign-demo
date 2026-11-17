@@ -1,0 +1,73 @@
+---
+// src/pages/404.astro
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout
+  title="Page Not Found | TRAILER COMMERCE"
+  description="The requested page could not be located. Explore our commercial trailer inventory or return to the homepage."
+  canonical="/404"
+>
+  <section class="section not-found-section">
+    <div class="container text-center">
+      <div class="not-found-content">
+        <span class="eyebrow eyebrow-forest">ERROR 404</span>
+        <h1 class="not-found-title">OFF THE BEATEN TRACK</h1>
+        <p class="not-found-desc">
+          The page or inventory specification you requested may have been relocated, archived, or does not exist.
+        </p>
+
+        <div class="not-found-actions">
+          <a href="/trailers" class="btn btn-primary btn-lg">
+            BROWSE TRAILER MODELS
+          </a>
+          <a href="/" class="btn btn-secondary btn-lg">
+            RETURN TO HOMEPAGE
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<style>
+  .not-found-section {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(4rem, 8vw, 8rem) 0;
+  }
+
+  .not-found-content {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .not-found-title {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    margin: 0.5rem 0 1rem 0;
+  }
+
+  .not-found-desc {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+  }
+
+  .not-found-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+</style>

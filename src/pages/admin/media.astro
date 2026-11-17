@@ -1,0 +1,561 @@
+---
+// src/pages/admin/media.astro
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { INITIAL_MEDIA } from '../../utils/demo-state';
+---
+
+<AdminLayout title="Media Asset Library" activeNav="media">
+  <div class="media-admin-wrapper">
+    <div class="admin-view-header">
+      <div>
+        <h2 class="view-title">Media Library</h2>
+        <p class="view-sub">Manage trailer photography, exterior composites, and promotional marketing imagery.</p>
+      </div>
+      <label class="btn btn-primary">
+        <input type="file" id="media-file-input" accept="image/*" multiple style="display: none;" />
+        + UPLOAD NEW ASSET
+      </label>
+    </div>
+
+    <!-- Drag & Drop Upload Zone -->
+    <div id="drop-zone" class="media-drop-zone editorial-card">
+      <div class="drop-zone-content">
+        <svg class="drop-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <p class="drop-text">Drag and drop trailer photos here, or <strong>browse local computer</strong></p>
+        <span class="drop-hint">PNG, JPG, WebP supported. Stored locally in browser session storage for demo testing.</span>
+      </div>
+    </div>
+
+    <!-- Toolbar: Search & Counts -->
+    <div class="media-toolbar editorial-card">
+      <div class="toolbar-search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          id="media-search-input"
+          class="toolbar-search-input"
+          placeholder="Filter media assets by title or tag..."
+        />
+      </div>
+
+      <span class="media-count-label">
+        Total indexed assets: <strong id="media-count-num">{INITIAL_MEDIA.length}</strong>
+      </span>
+    </div>
+
+    <!-- Media Grid -->
+    <div class="media-grid" id="media-assets-grid">
+      {INITIAL_MEDIA.map((item) => (
+        <div class="media-card editorial-card" data-media-id={item.id} data-title={item.title.toLowerCase()}>
+          <div class="media-thumb-frame">
+            <img src={item.url} alt={item.altText} class="media-thumb-img" />
+          </div>
+          <div class="media-card-body">
+            <span class="media-card-title">{item.title}</span>
+            <div class="media-card-meta">
+              <span>{item.dimensions}</span>
+              <span>•</span>
+              <span>{item.fileSize}</span>
+            </div>
+            <div class="media-actions-row">
+              <button class="btn-media-action inspect" data-id={item.id}>Inspect</button>
+              <button class="btn-media-action delete" data-id={item.id}>Delete</button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Media Inspect Modal -->
+    <div id="media-inspect-modal" class="media-modal" aria-hidden="true" role="dialog">
+      <div class="media-modal-dialog editorial-card">
+        <div class="media-modal-header">
+          <h3 id="inspect-modal-title" class="inspect-title">Media Details</h3>
+          <button id="close-media-modal" class="modal-close-btn">&times;</button>
+        </div>
+
+        <div class="inspect-grid">
+          <div class="inspect-preview-col">
+            <img id="inspect-img" src="" alt="Inspect" class="inspect-img-display" />
+          </div>
+          <div class="inspect-form-col">
+            <input type="hidden" id="inspect-id" />
+            <div class="form-group">
+              <label for="inspect-title-input" class="form-label">Asset Title</label>
+              <input type="text" id="inspect-title-input" class="form-input" />
+            </div>
+
+            <div class="form-group">
+              <label for="inspect-alt-input" class="form-label">SEO Alt Text</label>
+              <textarea id="inspect-alt-input" rows="2" class="form-textarea"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="inspect-url-input" class="form-label">Image Source URL</label>
+              <input type="text" id="inspect-url-input" class="form-input font-mono" readonly />
+            </div>
+
+            <div class="inspect-meta-box">
+              <div class="meta-row"><span>Dimensions:</span> <strong id="inspect-dim">-</strong></div>
+              <div class="meta-row"><span>File Size:</span> <strong id="inspect-size">-</strong></div>
+              <div class="meta-row"><span>Created:</span> <strong id="inspect-date">-</strong></div>
+            </div>
+
+            <div class="inspect-actions">
+              <button id="save-media-edits-btn" class="btn btn-primary btn-sm btn-block">
+                Save Asset Metadata
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<style>
+  .media-admin-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .admin-view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .view-title {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .view-sub {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* Drop Zone */
+  .media-drop-zone {
+    background-color: #FFFFFF;
+    border: 2px dashed var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .media-drop-zone.is-dragover {
+    border-color: var(--color-forest-green);
+    background-color: var(--color-pale-sand);
+  }
+
+  .drop-icon {
+    color: var(--color-forest-green);
+    margin-bottom: 0.75rem;
+  }
+
+  .drop-text {
+    font-size: 0.95rem;
+    color: var(--color-deep-charcoal);
+    margin-bottom: 0.25rem;
+  }
+
+  .drop-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  /* Toolbar */
+  .media-toolbar {
+    background-color: #FFFFFF;
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-pale-sand);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.85rem;
+    min-width: 280px;
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .toolbar-search-input {
+    border: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-deep-charcoal);
+    outline: none;
+    width: 100%;
+  }
+
+  .media-count-label {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  /* Grid */
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .media-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .media-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  .media-card {
+    background-color: #FFFFFF;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .media-thumb-frame {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-color: var(--color-pale-sand);
+  }
+
+  .media-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .media-card-body {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+  }
+
+  .media-card-title {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .media-card-meta {
+    display: flex;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .media-actions-row {
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .btn-media-action {
+    background: transparent;
+    border: none;
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .btn-media-action.inspect { color: var(--color-forest-green); }
+  .btn-media-action.delete { color: #A82424; }
+
+  /* Modal */
+  .media-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(37, 39, 36, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 2500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-fast);
+  }
+
+  .media-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .media-modal-dialog {
+    background-color: #FFFFFF;
+    width: 100%;
+    max-width: 780px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .media-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .inspect-title {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  .modal-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .inspect-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .inspect-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .inspect-img-display {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-pale-sand);
+  }
+
+  .inspect-meta-box {
+    background-color: var(--color-pale-sand);
+    padding: 0.75rem;
+    border-radius: var(--radius-xs);
+    font-size: 0.78rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { loadDemoState, saveDemoState, type MediaItem } from '../../utils/demo-state';
+
+  const grid = document.getElementById('media-assets-grid');
+  const countNum = document.getElementById('media-count-num');
+  const searchInput = document.getElementById('media-search-input') as HTMLInputElement;
+  const fileInput = document.getElementById('media-file-input') as HTMLInputElement;
+  const dropZone = document.getElementById('drop-zone');
+
+  const modal = document.getElementById('media-inspect-modal');
+  const closeBtn = document.getElementById('close-media-modal');
+  const inspectId = document.getElementById('inspect-id') as HTMLInputElement;
+  const inspectImg = document.getElementById('inspect-img') as HTMLImageElement;
+  const titleInput = document.getElementById('inspect-title-input') as HTMLInputElement;
+  const altInput = document.getElementById('inspect-alt-input') as HTMLTextAreaElement;
+  const urlInput = document.getElementById('inspect-url-input') as HTMLInputElement;
+  const dimSpan = document.getElementById('inspect-dim');
+  const sizeSpan = document.getElementById('inspect-size');
+  const dateSpan = document.getElementById('inspect-date');
+  const saveBtn = document.getElementById('save-media-edits-btn');
+
+  function renderMedia() {
+    const state = loadDemoState();
+    const media = state.media || [];
+    const q = searchInput?.value.trim().toLowerCase() || '';
+
+    const filtered = media.filter((m) =>
+      !q || m.title.toLowerCase().includes(q) || m.altText.toLowerCase().includes(q)
+    );
+
+    if (countNum) countNum.textContent = String(filtered.length);
+
+    if (grid) {
+      grid.innerHTML = filtered.map((m) => `
+        <div class="media-card editorial-card" data-media-id="${m.id}">
+          <div class="media-thumb-frame">
+            <img src="${m.url}" alt="${m.altText}" class="media-thumb-img" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=300&q=80'" />
+          </div>
+          <div class="media-card-body">
+            <span class="media-card-title">${m.title}</span>
+            <div class="media-card-meta">
+              <span>${m.dimensions}</span>
+              <span>•</span>
+              <span>${m.fileSize}</span>
+            </div>
+            <div class="media-actions-row">
+              <button class="btn-media-action inspect" data-id="${m.id}">Inspect</button>
+              <button class="btn-media-action delete" data-id="${m.id}">Delete</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      wireActions();
+    }
+  }
+
+  function wireActions() {
+    grid?.querySelectorAll('.btn-media-action.inspect').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.id;
+        const state = loadDemoState();
+        const item = state.media.find((m) => m.id === id);
+        if (item) openInspect(item);
+      });
+    });
+
+    grid?.querySelectorAll('.btn-media-action.delete').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.id;
+        if (!id) return;
+        if (confirm('Delete this media asset from local library?')) {
+          const state = loadDemoState();
+          state.media = state.media.filter((m) => m.id !== id);
+          saveDemoState(state);
+          renderMedia();
+        }
+      });
+    });
+  }
+
+  function openInspect(item: MediaItem) {
+    if (!modal) return;
+    if (inspectId) inspectId.value = item.id;
+    if (inspectImg) inspectImg.src = item.url;
+    if (titleInput) titleInput.value = item.title;
+    if (altInput) altInput.value = item.altText;
+    if (urlInput) urlInput.value = item.url;
+    if (dimSpan) dimSpan.textContent = item.dimensions;
+    if (sizeSpan) sizeSpan.textContent = item.fileSize;
+    if (dateSpan) dateSpan.textContent = item.createdAt;
+
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  closeBtn?.addEventListener('click', closeModal);
+
+  saveBtn?.addEventListener('click', () => {
+    const id = inspectId.value;
+    const state = loadDemoState();
+    const item = state.media.find((m) => m.id === id);
+    if (item) {
+      item.title = titleInput.value.trim();
+      item.altText = altInput.value.trim();
+      saveDemoState(state);
+      closeModal();
+      renderMedia();
+    }
+  });
+
+  // Upload Handling
+  fileInput?.addEventListener('change', () => {
+    handleFiles(fileInput.files);
+  });
+
+  dropZone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('is-dragover');
+  });
+
+  dropZone?.addEventListener('dragleave', () => {
+    dropZone.classList.remove('is-dragover');
+  });
+
+  dropZone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('is-dragover');
+    if (e.dataTransfer?.files) handleFiles(e.dataTransfer.files);
+  });
+
+  function handleFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const state = loadDemoState();
+
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        const newItem: MediaItem = {
+          id: `media-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          url: dataUrl,
+          title: file.name.replace(/\.[^/.]+$/, ''),
+          altText: `Commercial trailer photo - ${file.name}`,
+          category: 'Uploaded Asset',
+          fileSize: `${Math.round(file.size / 1024)} KB`,
+          dimensions: '1200 × 800',
+          createdAt: new Date().toISOString().split('T')[0]
+        };
+        state.media.unshift(newItem);
+        saveDemoState(state);
+        renderMedia();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  searchInput?.addEventListener('input', renderMedia);
+  document.addEventListener('DOMContentLoaded', renderMedia);
+</script>

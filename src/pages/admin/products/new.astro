@@ -1,0 +1,9 @@
+---
+// src/pages/admin/products/new.astro
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import ProductEditorForm from '../../../components/admin/ProductEditorForm.astro';
+---
+
+<AdminLayout title="Add New Product" activeNav="products">
+  <ProductEditorForm isNew={true} />
+</AdminLayout>

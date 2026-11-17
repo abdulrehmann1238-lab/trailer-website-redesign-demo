@@ -1,0 +1,334 @@
+---
+// src/pages/blog/index.astro
+import MainLayout from '../../layouts/MainLayout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { INITIAL_ARTICLES } from '../../data/articles';
+import { getBreadcrumbSchema } from '../../utils/schema';
+
+const featuredArticle = INITIAL_ARTICLES.find((a) => a.isFeatured) || INITIAL_ARTICLES[0];
+
+const categories = Array.from(new Set(INITIAL_ARTICLES.map((a) => a.category)));
+
+const breadcrumbs = [
+  { name: 'Home', url: '/' },
+  { name: 'Journal', url: '/blog' }
+];
+
+const breadcrumbSchema = getBreadcrumbSchema(breadcrumbs);
+---
+
+<MainLayout
+  title="Trailer Journal & Technical Hauling Guides | Trailer Commerce"
+  description="Practical technical guides on trailer selection, axle ratings, tongue weight calculations, and preventative maintenance for commercial haulers."
+  canonical="/blog"
+  jsonLdSchema={[breadcrumbSchema]}
+>
+  <!-- Header -->
+  <section class="journal-hero-section">
+    <div class="container">
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-separator">/</li>
+          <li class="breadcrumb-item is-current" aria-current="page">Journal</li>
+        </ol>
+      </nav>
+
+      <div class="journal-hero-content">
+        <span class="eyebrow eyebrow-forest">TECHNICAL KNOWLEDGE</span>
+        <h1 class="journal-title">THE HAULING JOURNAL</h1>
+        <p class="journal-lead">
+          Field-tested engineering guides, towing physics, and maintenance protocols from our trailer fabrication specialists.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Hero Article -->
+  <section class="section-tight journal-featured-section">
+    <div class="container">
+      <div class="featured-article-card editorial-card">
+        <div class="feat-img-col">
+          <img
+            src={featuredArticle.coverImage}
+            alt={featuredArticle.title}
+            class="feat-img"
+            fetchpriority="high"
+          />
+        </div>
+        <div class="feat-body-col">
+          <div class="feat-meta-row">
+            <span class="badge badge-featured">FEATURED GUIDE</span>
+            <span class="badge badge-category">{featuredArticle.category}</span>
+            <span class="feat-reading-time">{featuredArticle.readingTime}</span>
+          </div>
+
+          <h2 class="feat-title">
+            <a href={`/blog/${featuredArticle.slug}`} class="feat-title-link">
+              {featuredArticle.title}
+            </a>
+          </h2>
+
+          <p class="feat-excerpt">{featuredArticle.excerpt}</p>
+
+          <div class="feat-author-row">
+            <div class="author-info">
+              <img src={featuredArticle.author.avatar} alt={featuredArticle.author.name} class="author-avatar" />
+              <div>
+                <span class="author-name">{featuredArticle.author.name}</span>
+                <span class="author-role">{featuredArticle.author.role}</span>
+              </div>
+            </div>
+            <a href={`/blog/${featuredArticle.slug}`} class="btn btn-primary btn-sm">
+              READ COMPLETE GUIDE &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter & All Articles Grid -->
+  <section class="section journal-grid-section">
+    <div class="container">
+      <div class="journal-controls-bar">
+        <div class="category-pills">
+          <button class="cat-pill is-active" data-cat="all">All Articles</button>
+          {categories.map((cat) => (
+            <button class="cat-pill" data-cat={cat}>{cat}</button>
+          ))}
+        </div>
+
+        <div class="journal-search-wrap">
+          <input
+            type="text"
+            id="journal-search-input"
+            class="form-input"
+            placeholder="Search guides by keyword..."
+            aria-label="Search articles"
+          />
+        </div>
+      </div>
+
+      <div id="journal-articles-grid" class="articles-grid">
+        {INITIAL_ARTICLES.map((article) => (
+          <div class="article-item-wrapper" data-category={article.category} data-title={article.title.toLowerCase()}>
+            <BlogCard article={article} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<style>
+  .journal-hero-section {
+    background-color: var(--color-pale-sand);
+    border-bottom: 1px solid var(--border-medium);
+    padding: clamp(2.5rem, 5vw, 4rem) 0;
+  }
+
+  .journal-title {
+    margin: 0.4rem 0 0.85rem 0;
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+  }
+
+  .journal-lead {
+    max-width: 720px;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Featured Article */
+  .featured-article-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    background-color: var(--color-pure-white);
+  }
+
+  @media (min-width: 992px) {
+    .featured-article-card {
+      grid-template-columns: 1.2fr 1fr;
+    }
+  }
+
+  .feat-img-col {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+
+  .feat-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .feat-body-col {
+    padding: clamp(1.75rem, 3.5vw, 2.75rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+
+  .feat-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .feat-reading-time {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .feat-title {
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .feat-title-link {
+    color: var(--color-deep-charcoal);
+  }
+  .feat-title-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  .feat-excerpt {
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .feat-author-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    flex-wrap: wrap;
+  }
+
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .author-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .author-name {
+    font-family: var(--font-heading);
+    font-size: 0.88rem;
+    font-weight: 700;
+    display: block;
+    color: var(--color-deep-charcoal);
+  }
+
+  .author-role {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    display: block;
+  }
+
+  /* Controls */
+  .journal-controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .category-pills {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cat-pill {
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-full);
+    padding: 0.45rem 1rem;
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-deep-charcoal);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .cat-pill.is-active, .cat-pill:hover {
+    background-color: var(--color-forest-green);
+    color: var(--color-pure-white);
+    border-color: var(--color-forest-green);
+  }
+
+  .journal-search-wrap {
+    min-width: 260px;
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .articles-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>
+
+<script>
+  const pills = document.querySelectorAll('.cat-pill');
+  const searchInput = document.getElementById('journal-search-input') as HTMLInputElement;
+  const articleItems = document.querySelectorAll('.article-item-wrapper');
+
+  let activeCat = 'all';
+
+  function filterArticles() {
+    const q = searchInput?.value.trim().toLowerCase() || '';
+
+    articleItems.forEach((item) => {
+      const el = item as HTMLElement;
+      const cat = el.dataset.category || '';
+      const title = el.dataset.title || '';
+
+      const matchCat = activeCat === 'all' || cat === activeCat;
+      const matchQuery = !q || title.includes(q) || cat.toLowerCase().includes(q);
+
+      if (matchCat && matchQuery) {
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  pills.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      pills.forEach((p) => p.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      activeCat = (btn as HTMLElement).dataset.cat || 'all';
+      filterArticles();
+    });
+  });
+
+  searchInput?.addEventListener('input', filterArticles);
+</script>

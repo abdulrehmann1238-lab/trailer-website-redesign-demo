@@ -1,0 +1,510 @@
+---
+// CompareTray.astro
+---
+<!-- Bottom Floating Comparison Tray -->
+<div id="compare-tray" class="compare-tray" aria-hidden="true">
+  <div class="container compare-tray-inner">
+    <div class="tray-info">
+      <span class="tray-label">COMPARE TRAILERS</span>
+      <span id="tray-count-indicator" class="tray-count">(0 of 3 selected)</span>
+    </div>
+
+    <!-- Selected items list -->
+    <div id="tray-items-list" class="tray-items-list">
+      <!-- Injected via JavaScript -->
+    </div>
+
+    <!-- Actions -->
+    <div class="tray-actions">
+      <button id="open-comparison-matrix-btn" class="btn btn-primary btn-sm" disabled>
+        COMPARE NOW
+      </button>
+      <button id="clear-all-compare-btn" class="btn-clear-tray" title="Clear selection">
+        CLEAR
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Full Comparison Matrix Modal -->
+<div id="compare-modal" class="compare-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="matrix-title">
+  <div class="compare-modal-dialog">
+    <div class="compare-modal-header">
+      <div>
+        <span class="eyebrow eyebrow-forest">SIDE-BY-SIDE EVALUATION</span>
+        <h3 id="matrix-title" class="matrix-title">TRAILER COMPARISON MATRIX</h3>
+      </div>
+      <button id="close-compare-modal-btn" class="modal-close-icon" aria-label="Close comparison view">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="matrix-content-scroll">
+      <div id="compare-matrix-table-container">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Bottom Floating Tray */
+  .compare-tray {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--color-pure-white);
+    border-top: 2px solid var(--color-forest-green);
+    box-shadow: 0 -8px 24px rgba(37, 39, 36, 0.12);
+    z-index: 1500;
+    transform: translateY(100%);
+    transition: transform var(--transition-base);
+    padding: 0.75rem 0;
+  }
+
+  .compare-tray.is-visible {
+    transform: translateY(0);
+  }
+
+  .compare-tray-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tray-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tray-label {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-deep-charcoal);
+  }
+
+  .tray-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .tray-items-list {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  :global(.tray-item-pill) {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background-color: var(--color-warm-ivory);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.5rem;
+  }
+
+  :global(.tray-item-thumb) {
+    width: 40px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 2px;
+  }
+
+  :global(.tray-item-name) {
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 600;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.tray-item-remove) {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :global(.tray-item-remove:hover) {
+    color: #A82424;
+  }
+
+  .tray-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .btn-clear-tray {
+    background: transparent;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .btn-clear-tray:hover {
+    color: #A82424;
+  }
+
+  /* Full Comparison Modal */
+  .compare-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(37, 39, 36, 0.65);
+    backdrop-filter: blur(6px);
+    z-index: 3800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+  }
+
+  .compare-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .compare-modal-dialog {
+    background-color: var(--color-warm-ivory);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-modal);
+    width: 100%;
+    max-width: 1080px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform var(--transition-base);
+  }
+
+  .compare-modal.is-open .compare-modal-dialog {
+    transform: translateY(0);
+  }
+
+  .compare-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-medium);
+    background-color: var(--color-pure-white);
+  }
+
+  .matrix-title {
+    font-size: 1.35rem;
+    margin: 0.2rem 0 0 0;
+  }
+
+  .modal-close-icon {
+    background: transparent;
+    border: none;
+    color: var(--color-deep-charcoal);
+    cursor: pointer;
+    padding: 0.4rem;
+  }
+
+  .matrix-content-scroll {
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 2rem;
+  }
+
+  /* Table styling */
+  :global(.compare-table) {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+  }
+
+  :global(.compare-table th, .compare-table td) {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  :global(.compare-table th) {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: rgba(37, 39, 36, 0.03);
+    width: 22%;
+  }
+
+  :global(.compare-product-col) {
+    width: 26%;
+    vertical-align: top;
+  }
+
+  :global(.compare-card-head) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  :global(.compare-prod-img) {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-pale-sand);
+  }
+
+  :global(.compare-prod-title) {
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+  }
+
+  :global(.compare-prod-price) {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+  }
+</style>
+
+<script>
+  import { loadDemoState, saveDemoState, type Product } from '../utils/demo-state';
+
+  const tray = document.getElementById('compare-tray');
+  const countIndicator = document.getElementById('tray-count-indicator');
+  const itemsList = document.getElementById('tray-items-list');
+  const compareNowBtn = document.getElementById('open-comparison-matrix-btn') as HTMLButtonElement;
+  const clearBtn = document.getElementById('clear-all-compare-btn');
+
+  const modal = document.getElementById('compare-modal');
+  const closeModalBtn = document.getElementById('close-compare-modal-btn');
+  const matrixContainer = document.getElementById('compare-matrix-table-container');
+
+  function renderTray() {
+    const state = loadDemoState();
+    const ids = state.comparedProductIds || [];
+    const count = ids.length;
+
+    if (countIndicator) countIndicator.textContent = `(${count} of 3 selected)`;
+
+    if (count > 0) {
+      tray?.classList.add('is-visible');
+      if (compareNowBtn) compareNowBtn.disabled = count < 2;
+    } else {
+      tray?.classList.remove('is-visible');
+    }
+
+    if (itemsList) {
+      const selectedProducts = ids
+        .map((id) => state.products.find((p) => p.id === id))
+        .filter(Boolean) as Product[];
+
+      itemsList.innerHTML = selectedProducts
+        .map(
+          (p) => `
+        <div class="tray-item-pill">
+          <img src="${p.mainImage}" alt="${p.name}" class="tray-item-thumb" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=100&q=80'" />
+          <span class="tray-item-name">${p.name}</span>
+          <button class="tray-item-remove" data-remove-id="${p.id}" title="Remove from comparison">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      `
+        )
+        .join('');
+
+      // Wire remove buttons
+      itemsList.querySelectorAll('.tray-item-remove').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const removeId = (btn as HTMLElement).dataset.removeId;
+          if (removeId) removeFromCompare(removeId);
+        });
+      });
+    }
+  }
+
+  export function addToCompare(productId: string) {
+    const state = loadDemoState();
+    if (!state.comparedProductIds) state.comparedProductIds = [];
+    if (state.comparedProductIds.includes(productId)) return;
+
+    if (state.comparedProductIds.length >= 3) {
+      alert('You can compare a maximum of 3 trailers simultaneously. Please remove one first.');
+      return;
+    }
+
+    state.comparedProductIds.push(productId);
+    saveDemoState(state);
+    renderTray();
+  }
+
+  export function removeFromCompare(productId: string) {
+    const state = loadDemoState();
+    state.comparedProductIds = (state.comparedProductIds || []).filter((id) => id !== productId);
+    saveDemoState(state);
+    renderTray();
+    if (modal?.classList.contains('is-open')) renderMatrixModal();
+  }
+
+  function clearCompare() {
+    const state = loadDemoState();
+    state.comparedProductIds = [];
+    saveDemoState(state);
+    renderTray();
+    closeModal();
+  }
+
+  function openModal() {
+    if (!modal) return;
+    renderMatrixModal();
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function renderMatrixModal() {
+    const state = loadDemoState();
+    const ids = state.comparedProductIds || [];
+    const prods = ids
+      .map((id) => state.products.find((p) => p.id === id))
+      .filter(Boolean) as Product[];
+
+    if (!matrixContainer) return;
+
+    if (prods.length === 0) {
+      matrixContainer.innerHTML = '<p class="mono-tag">No trailers currently selected for comparison.</p>';
+      return;
+    }
+
+    matrixContainer.innerHTML = `
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>SPECIFICATION</th>
+            ${prods.map(p => `
+              <td class="compare-product-col">
+                <div class="compare-card-head">
+                  <img src="${p.mainImage}" alt="${p.name}" class="compare-prod-img" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'" />
+                  <span class="compare-prod-title">${p.name}</span>
+                  <span class="compare-prod-price">$${p.price.toLocaleString()}</span>
+                  <a href="/product/${p.slug}" class="btn btn-primary btn-sm" style="margin-top:0.5rem">View Details</a>
+                </div>
+              </td>
+            `).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Category</th>
+            ${prods.map(p => `<td>${p.categoryName}</td>`).join('')}
+          </tr>
+          <tr>
+            <th>Dimensions</th>
+            ${prods.map(p => `<td>${p.specifications.dimensions}</td>`).join('')}
+          </tr>
+          <tr>
+            <th>Axle Setup</th>
+            ${prods.map(p => `<td>${p.specifications.axles}</td>`).join('')}
+          </tr>
+          <tr>
+            <th>Payload Capacity</th>
+            ${prods.map(p => `<td><strong>${p.specifications.capacity}</strong></td>`).join('')}
+          </tr>
+          <tr>
+            <th>Frame Material</th>
+            ${prods.map(p => `<td>${p.specifications.material}</td>`).join('')}
+          </tr>
+          <tr>
+            <th>Colour</th>
+            ${prods.map(p => `<td>${p.specifications.colour}</td>`).join('')}
+          </tr>
+          <tr>
+            <th>GVWR</th>
+            ${prods.map(p => `<td>${p.specifications.gvwr}</td>`).join('')}
+          </tr>
+          <tr>
+            <th>Brake System</th>
+            ${prods.map(p => `<td>${p.specifications.brakes}</td>`).join('')}
+          </tr>
+          <tr>
+            <th>Hitch Coupler</th>
+            ${prods.map(p => `<td>${p.specifications.hitchType}</td>`).join('')}
+          </tr>
+          <tr>
+            <th>Availability</th>
+            ${prods.map(p => `<td><span class="badge badge-stock">${p.specifications.availability}</span></td>`).join('')}
+          </tr>
+        </tbody>
+      </table>
+    `;
+  }
+
+  compareNowBtn?.addEventListener('click', openModal);
+  closeModalBtn?.addEventListener('click', closeModal);
+  clearBtn?.addEventListener('click', clearCompare);
+
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('is-open')) closeModal();
+  });
+
+  // Global custom events
+  window.addEventListener('tc-add-to-compare', ((e: CustomEvent) => {
+    if (e.detail?.id) addToCompare(e.detail.id);
+  }) as EventListener);
+
+  window.addEventListener('toggle-compare-tray', () => {
+    const state = loadDemoState();
+    if ((state.comparedProductIds?.length || 0) > 0) {
+      openModal();
+    } else {
+      alert('You have not selected any trailers to compare yet. Click "Compare" on any trailer card to start.');
+    }
+  });
+
+  window.addEventListener('tc-demo-state-updated', renderTray);
+  document.addEventListener('DOMContentLoaded', renderTray);
+</script>

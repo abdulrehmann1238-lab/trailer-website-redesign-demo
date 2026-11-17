@@ -1,0 +1,721 @@
+---
+// src/pages/product/[slug].astro
+import MainLayout from '../../layouts/MainLayout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { INITIAL_PRODUCTS, type Product } from '../../data/products';
+import { getProductSchema, getBreadcrumbSchema } from '../../utils/schema';
+
+export function getStaticPaths() {
+  return INITIAL_PRODUCTS.map((product) => ({
+    params: { slug: product.slug },
+    props: { product }
+  }));
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+
+// Related products in same category (or other featured)
+const relatedProducts = INITIAL_PRODUCTS.filter(
+  (p) => p.category === product.category && p.id !== product.id
+).slice(0, 3);
+
+// If not enough in same category, pad with other products
+if (relatedProducts.length < 3) {
+  const fillers = INITIAL_PRODUCTS.filter(
+    (p) => p.id !== product.id && !relatedProducts.some((r) => r.id === p.id)
+  ).slice(0, 3 - relatedProducts.length);
+  relatedProducts.push(...fillers);
+}
+
+const breadcrumbs = [
+  { name: 'Home', url: '/' },
+  { name: 'Trailers', url: '/trailers' },
+  { name: product.categoryName, url: `/trailers/${product.category}` },
+  { name: product.name, url: `/product/${product.slug}` }
+];
+
+const productSchema = getProductSchema(product);
+const breadcrumbSchema = getBreadcrumbSchema(breadcrumbs);
+---
+
+<MainLayout
+  title={product.seoTitle}
+  description={product.seoDescription}
+  canonical={`/product/${product.slug}`}
+  image={product.mainImage}
+  type="product"
+  jsonLdSchema={[productSchema, breadcrumbSchema]}
+>
+  <div class="product-pdp-wrapper" data-pdp-id={product.id} data-slug={product.slug}>
+    <!-- Top Breadcrumbs -->
+    <div class="container pdp-breadcrumb-container">
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-separator">/</li>
+          <li class="breadcrumb-item"><a href="/trailers">Trailers</a></li>
+          <li class="breadcrumb-separator">/</li>
+          <li class="breadcrumb-item"><a href={`/trailers/${product.category}`}>{product.categoryName}</a></li>
+          <li class="breadcrumb-separator">/</li>
+          <li class="breadcrumb-item is-current" aria-current="page">{product.name}</li>
+        </ol>
+      </nav>
+    </div>
+
+    <!-- Main PDP Grid: Gallery (Left) & Purchasing Info (Right) -->
+    <div class="container pdp-main-section">
+      <div class="pdp-grid">
+        <!-- LEFT: Gallery & Lightbox -->
+        <div class="pdp-gallery-col">
+          <div class="pdp-main-media-frame">
+            <img
+              id="pdp-main-display-img"
+              src={product.mainImage}
+              alt={product.name}
+              class="pdp-main-img pdp-live-main-img"
+              fetchpriority="high"
+            />
+            <button id="pdp-open-lightbox-btn" class="pdp-lightbox-trigger" aria-label="Open full-screen photo gallery">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+              </svg>
+              <span>ZOOM GALLERY</span>
+            </button>
+          </div>
+
+          <!-- Thumbnails Row -->
+          <div class="pdp-thumbnails-strip" role="group" aria-label="Product image gallery thumbnails">
+            {product.gallery.map((imgUrl, index) => (
+              <button
+                type="button"
+                class:list={['pdp-thumb-btn', { 'is-active': index === 0 }]}
+                data-img-src={imgUrl}
+                data-index={index}
+                aria-label={`View photo ${index + 1}`}
+              >
+                <img src={imgUrl} alt={`${product.name} view ${index + 1}`} class="pdp-thumb-img" />
+              </button>
+            ))}
+          </div>
+
+          <!-- Trust Badges Under Gallery -->
+          <div class="pdp-assurances-strip">
+            <div class="assurance-pill">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#26372F" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span>Commercial Frame Guarantee</span>
+            </div>
+            <div class="assurance-pill">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#26372F" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Full 24-Point Road Inspection</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Pricing, Specs, CTAs -->
+        <div class="pdp-details-col">
+          <div class="pdp-header-block">
+            <span class="eyebrow eyebrow-forest">{product.categoryName}</span>
+            <h1 class="pdp-title pdp-live-title">{product.name}</h1>
+            
+            <div class="pdp-pricing-row">
+              <div class="price-stack">
+                <span class="pdp-price-amount pdp-live-price">
+                  ${(product.salePrice || product.price).toLocaleString()}
+                </span>
+                <span class="price-currency-note">USD Demo Price</span>
+              </div>
+              <span class:list={['badge', product.specifications.availability === 'In Stock' ? 'badge-stock' : 'badge-order']}>
+                {product.specifications.availability}
+              </span>
+            </div>
+          </div>
+
+          <div class="pdp-description-block">
+            <p class="pdp-lead-desc pdp-live-desc">{product.description}</p>
+          </div>
+
+          <!-- Primary Actions -->
+          <div class="pdp-actions-card">
+            <button
+              id="pdp-main-enquire-btn"
+              class="btn btn-primary btn-lg btn-block"
+              data-product-title={product.name}
+            >
+              ENQUIRE ABOUT THIS TRAILER
+            </button>
+            
+            <button
+              id="pdp-add-compare-btn"
+              class="btn btn-secondary btn-block"
+              data-product-id={product.id}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 3h5v5"></path>
+                <path d="M4 20L21 3"></path>
+                <path d="M21 16v5h-5"></path>
+                <path d="M15 15l6 6"></path>
+                <path d="M4 4l5 5"></path>
+              </svg>
+              ADD TO SIDE-BY-SIDE COMPARISON
+            </button>
+          </div>
+
+          <!-- Technical Specs Table -->
+          <div class="pdp-specs-panel">
+            <h3 class="specs-panel-title">TECHNICAL SPECIFICATIONS</h3>
+            <table class="specs-table">
+              <tbody>
+                <tr>
+                  <td class="spec-prop">Deck Dimensions</td>
+                  <td class="spec-val">{product.specifications.dimensions}</td>
+                </tr>
+                <tr>
+                  <td class="spec-prop">Axle Configuration</td>
+                  <td class="spec-val">{product.specifications.axles}</td>
+                </tr>
+                <tr>
+                  <td class="spec-prop">Payload Capacity</td>
+                  <td class="spec-val"><strong>{product.specifications.capacity}</strong></td>
+                </tr>
+                <tr>
+                  <td class="spec-prop">Chassis & Skin Material</td>
+                  <td class="spec-val">{product.specifications.material}</td>
+                </tr>
+                <tr>
+                  <td class="spec-prop">GVWR (Gross Rating)</td>
+                  <td class="spec-val">{product.specifications.gvwr}</td>
+                </tr>
+                <tr>
+                  <td class="spec-prop">Empty Curb Weight</td>
+                  <td class="spec-val">{product.specifications.emptyWeight}</td>
+                </tr>
+                <tr>
+                  <td class="spec-prop">Hitch Coupler Class</td>
+                  <td class="spec-val">{product.specifications.hitchType}</td>
+                </tr>
+                <tr>
+                  <td class="spec-prop">Braking System</td>
+                  <td class="spec-val">{product.specifications.brakes}</td>
+                </tr>
+                <tr>
+                  <td class="spec-prop">Standard Colour Finish</td>
+                  <td class="spec-val">{product.specifications.colour}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Trailers Strip -->
+    <section class="section pdp-related-section">
+      <div class="container">
+        <div class="section-head-split">
+          <div>
+            <span class="eyebrow eyebrow-forest">COMPARATIVE MODELS</span>
+            <h2 class="section-heading">Similar Trailers to Consider</h2>
+          </div>
+          <a href="/trailers" class="btn btn-secondary btn-sm">
+            VIEW ALL TRAILERS &rarr;
+          </a>
+        </div>
+
+        <div class="pdp-related-grid">
+          {relatedProducts.map((relProd) => (
+            <ProductCard product={relProd} />
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Full-Screen Lightbox Modal -->
+    <div id="pdp-lightbox" class="pdp-lightbox" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="lightbox-wrapper">
+        <button id="lightbox-close-btn" class="lightbox-btn-close" aria-label="Close photo gallery">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <button id="lightbox-prev-btn" class="lightbox-nav-btn prev" aria-label="Previous image">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <div class="lightbox-img-stage">
+          <img id="lightbox-display-img" src={product.mainImage} alt={product.name} class="lightbox-img" />
+          <div class="lightbox-caption">
+            <span id="lightbox-caption-text">{product.name}</span>
+            <span id="lightbox-counter-text" class="lightbox-counter">1 / {product.gallery.length}</span>
+          </div>
+        </div>
+
+        <button id="lightbox-next-btn" class="lightbox-nav-btn next" aria-label="Next image">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .product-pdp-wrapper {
+    padding-bottom: 5rem;
+  }
+
+  .pdp-breadcrumb-container {
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .pdp-main-section {
+    padding-top: 1rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .pdp-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+    align-items: flex-start;
+  }
+
+  @media (min-width: 992px) {
+    .pdp-grid {
+      grid-template-columns: 1.15fr 1fr;
+    }
+  }
+
+  /* Gallery Left Col */
+  .pdp-gallery-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .pdp-main-media-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 11;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-pale-sand);
+    box-shadow: var(--shadow-card);
+  }
+
+  .pdp-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pdp-lightbox-trigger {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    background-color: rgba(37, 39, 36, 0.88);
+    backdrop-filter: blur(4px);
+    color: var(--color-warm-ivory);
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: 0.5rem 0.85rem;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: background-color var(--transition-fast);
+  }
+
+  .pdp-lightbox-trigger:hover {
+    background-color: var(--color-forest-green);
+  }
+
+  .pdp-thumbnails-strip {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .pdp-thumb-btn {
+    width: 90px;
+    height: 65px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    background-color: var(--color-pale-sand);
+    flex-shrink: 0;
+    transition: border-color var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .pdp-thumb-btn.is-active {
+    border-color: var(--color-forest-green);
+    transform: scale(1.03);
+  }
+
+  .pdp-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pdp-assurances-strip {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 0.75rem;
+  }
+
+  .assurance-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-deep-charcoal);
+  }
+
+  /* Details Right Col */
+  .pdp-details-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .pdp-header-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .pdp-title {
+    font-size: clamp(2rem, 3.5vw, 2.75rem);
+    margin: 0;
+    line-height: 1.15;
+  }
+
+  .pdp-pricing-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .price-stack {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .pdp-price-amount {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+  }
+
+  .price-currency-note {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .pdp-lead-desc {
+    font-size: 1.02rem;
+    line-height: 1.68;
+    color: var(--text-secondary);
+  }
+
+  .pdp-actions-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+  }
+
+  /* Specs Panel */
+  .pdp-specs-panel {
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+  }
+
+  .specs-panel-title {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .specs-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .specs-table td {
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.9rem;
+  }
+
+  .spec-prop {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    width: 45%;
+  }
+
+  .spec-val {
+    color: var(--color-deep-charcoal);
+  }
+
+  /* Related Products */
+  .pdp-related-section {
+    background-color: var(--color-pale-sand);
+    border-top: 1px solid var(--border-medium);
+    border-bottom: 1px solid var(--border-medium);
+  }
+
+  .pdp-related-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .pdp-related-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Lightbox */
+  .pdp-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(28, 43, 36, 0.96);
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+  }
+
+  .pdp-lightbox.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .lightbox-wrapper {
+    position: relative;
+    max-width: 1100px;
+    width: 100%;
+    height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-btn-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    color: var(--color-pure-white);
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .lightbox-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    color: var(--color-pure-white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background-color var(--transition-fast);
+  }
+
+  .lightbox-nav-btn:hover {
+    background-color: var(--color-forest-green);
+  }
+
+  .lightbox-nav-btn.prev {
+    left: 1rem;
+  }
+
+  .lightbox-nav-btn.next {
+    right: 1rem;
+  }
+
+  .lightbox-img-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 90%;
+    max-height: 100%;
+  }
+
+  .lightbox-img {
+    max-width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+  }
+
+  .lightbox-caption {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: var(--color-warm-ivory);
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+  }
+
+  .lightbox-counter {
+    font-family: var(--font-mono);
+    color: var(--color-soft-stone);
+    font-size: 0.8rem;
+  }
+</style>
+
+<script>
+  // PDP Gallery & Lightbox Logic
+  const displayImg = document.getElementById('pdp-main-display-img') as HTMLImageElement;
+  const thumbBtns = document.querySelectorAll('.pdp-thumb-btn');
+  const openLightboxBtn = document.getElementById('pdp-open-lightbox-btn');
+  const lightbox = document.getElementById('pdp-lightbox');
+  const lightboxImg = document.getElementById('lightbox-display-img') as HTMLImageElement;
+  const closeLightboxBtn = document.getElementById('lightbox-close-btn');
+  const prevLightboxBtn = document.getElementById('lightbox-prev-btn');
+  const nextLightboxBtn = document.getElementById('lightbox-next-btn');
+  const counterText = document.getElementById('lightbox-counter-text');
+
+  const galleryUrls = Array.from(thumbBtns).map((btn) => (btn as HTMLElement).dataset.imgSrc || '');
+  let activeIndex = 0;
+
+  function switchMainImage(index: number) {
+    if (!galleryUrls[index]) return;
+    activeIndex = index;
+    if (displayImg) displayImg.src = galleryUrls[index];
+
+    thumbBtns.forEach((btn, i) => {
+      btn.classList.toggle('is-active', i === index);
+    });
+  }
+
+  thumbBtns.forEach((btn, i) => {
+    btn.addEventListener('click', () => switchMainImage(i));
+  });
+
+  // Lightbox
+  function openLightbox() {
+    if (!lightbox) return;
+    updateLightboxStage();
+    lightbox.classList.add('is-open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.remove('is-open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function updateLightboxStage() {
+    if (lightboxImg && galleryUrls[activeIndex]) {
+      lightboxImg.src = galleryUrls[activeIndex];
+    }
+    if (counterText) {
+      counterText.textContent = `${activeIndex + 1} / ${galleryUrls.length}`;
+    }
+  }
+
+  function nextImage() {
+    activeIndex = (activeIndex + 1) % galleryUrls.length;
+    updateLightboxStage();
+    switchMainImage(activeIndex);
+  }
+
+  function prevImage() {
+    activeIndex = (activeIndex - 1 + galleryUrls.length) % galleryUrls.length;
+    updateLightboxStage();
+    switchMainImage(activeIndex);
+  }
+
+  openLightboxBtn?.addEventListener('click', openLightbox);
+  closeLightboxBtn?.addEventListener('click', closeLightbox);
+  nextLightboxBtn?.addEventListener('click', nextImage);
+  prevLightboxBtn?.addEventListener('click', prevImage);
+
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (!lightbox?.classList.contains('is-open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') nextImage();
+    if (e.key === 'ArrowLeft') prevImage();
+  });
+
+  // Enquire CTA Button
+  document.getElementById('pdp-main-enquire-btn')?.addEventListener('click', () => {
+    const title = (document.getElementById('pdp-main-enquire-btn') as HTMLElement)?.dataset.productTitle || '';
+    window.dispatchEvent(new CustomEvent('open-enquiry-modal', { detail: { product: title } }));
+  });
+
+  // Add to Compare Button
+  document.getElementById('pdp-add-compare-btn')?.addEventListener('click', () => {
+    const id = (document.getElementById('pdp-add-compare-btn') as HTMLElement)?.dataset.productId;
+    if (id) {
+      window.dispatchEvent(new CustomEvent('tc-add-to-compare', { detail: { id } }));
+    }
+  });
+</script>

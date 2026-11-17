@@ -1,0 +1,448 @@
+---
+// src/pages/admin/products/index.astro
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { INITIAL_PRODUCTS } from '../../../data/products';
+import { CATEGORIES } from '../../../data/categories';
+---
+
+<AdminLayout title="Product Inventory Collection" activeNav="products">
+  <div class="products-admin-wrapper">
+    <!-- Header with Action -->
+    <div class="admin-view-header">
+      <div>
+        <h2 class="view-title">Trailer Inventory</h2>
+        <p class="view-sub">Manage product specifications, commercial pricing, availability status, and gallery assets.</p>
+      </div>
+      <a href="/admin/products/new" class="btn btn-primary">
+        + ADD NEW TRAILER
+      </a>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="admin-table-toolbar editorial-card">
+      <div class="toolbar-search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          id="admin-prod-search"
+          class="toolbar-search-input"
+          placeholder="Search products by model name, dimensions, or sku..."
+        />
+      </div>
+
+      <div class="toolbar-filters-wrap">
+        <select id="admin-cat-filter" class="form-select toolbar-select">
+          <option value="all">All Categories</option>
+          {CATEGORIES.map((c) => (
+            <option value={c.slug}>{c.name}</option>
+          ))}
+        </select>
+
+        <select id="admin-avail-filter" class="form-select toolbar-select">
+          <option value="all">All Availability</option>
+          <option value="In Stock">In Stock</option>
+          <option value="Built to Order">Built to Order</option>
+          <option value="Available Soon">Available Soon</option>
+        </select>
+
+        <select id="admin-sort-select" class="form-select toolbar-select">
+          <option value="newest">Recently Updated</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name-asc">Name: A to Z</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Product Table Container -->
+    <div class="admin-table-card editorial-card">
+      <div class="table-responsive">
+        <table class="admin-table products-table">
+          <thead>
+            <tr>
+              <th>THUMBNAIL</th>
+              <th>TRAILER NAME</th>
+              <th>CATEGORY</th>
+              <th>PRICE</th>
+              <th>STATUS</th>
+              <th>LAST UPDATED</th>
+              <th style="text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="products-table-tbody">
+            {INITIAL_PRODUCTS.map((prod) => (
+              <tr data-row-id={prod.id}>
+                <td>
+                  <img
+                    src={prod.mainImage}
+                    alt={prod.name}
+                    class="table-thumb"
+                    onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=100&q=80'"
+                  />
+                </td>
+                <td>
+                  <a href={`/admin/products/${prod.id}`} class="table-title-link">
+                    {prod.name}
+                  </a>
+                  <span class="table-dim-sub">{prod.specifications.dimensions}</span>
+                </td>
+                <td><span class="badge badge-category">{prod.categoryName}</span></td>
+                <td><strong>${prod.price.toLocaleString()}</strong></td>
+                <td>
+                  <span class:list={['badge', prod.specifications.availability === 'In Stock' ? 'badge-stock' : 'badge-order']}>
+                    {prod.specifications.availability}
+                  </span>
+                </td>
+                <td><span class="mono-tag">{prod.updatedAt}</span></td>
+                <td style="text-align: right;">
+                  <div class="row-actions-group">
+                    <a href={`/admin/products/${prod.id}`} class="btn-action edit" title="Edit Product">
+                      Edit
+                    </a>
+                    <button class="btn-action duplicate" data-dup-id={prod.id} title="Duplicate Product">
+                      Duplicate
+                    </button>
+                    <button class="btn-action delete" data-del-id={prod.id} title="Delete Product">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty state -->
+      <div id="admin-table-empty" class="admin-empty-state" style="display: none;">
+        <p class="empty-title">No products match current filters</p>
+        <button id="admin-clear-filter-btn" class="btn btn-secondary btn-sm">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<style>
+  .products-admin-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .admin-view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .view-title {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .view-sub {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* Toolbar */
+  .admin-table-toolbar {
+    background-color: #FFFFFF;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-pale-sand);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.85rem;
+    min-width: 280px;
+    flex: 1;
+    max-width: 420px;
+  }
+
+  .toolbar-search-input {
+    border: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-deep-charcoal);
+    outline: none;
+    width: 100%;
+  }
+
+  .toolbar-filters-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-select {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.82rem;
+    min-width: 150px;
+  }
+
+  /* Table Card */
+  .admin-table-card {
+    background-color: #FFFFFF;
+    padding: 0.5rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .products-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .products-table th, .products-table td {
+    padding: 0.95rem 0.85rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .table-thumb {
+    width: 54px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: var(--radius-xs);
+    background-color: var(--color-pale-sand);
+  }
+
+  .table-title-link {
+    font-family: var(--font-heading);
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--color-deep-charcoal);
+    display: block;
+  }
+
+  .table-title-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  .table-dim-sub {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .row-actions-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .btn-action {
+    background: transparent;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-xs);
+    padding: 0.25rem 0.55rem;
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .btn-action.edit {
+    color: var(--color-forest-green);
+  }
+  .btn-action.edit:hover {
+    background-color: var(--color-forest-green);
+    color: var(--color-pure-white);
+  }
+
+  .btn-action.duplicate {
+    color: var(--text-secondary);
+  }
+  .btn-action.duplicate:hover {
+    background-color: var(--color-pale-sand);
+    color: var(--color-deep-charcoal);
+  }
+
+  .btn-action.delete {
+    color: #A82424;
+    border-color: rgba(168, 36, 36, 0.3);
+  }
+  .btn-action.delete:hover {
+    background-color: #A82424;
+    color: var(--color-pure-white);
+  }
+
+  .admin-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  .empty-title {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+</style>
+
+<script>
+  import { loadDemoState, deleteStoredProduct, upsertStoredProduct, type Product } from '../../../utils/demo-state';
+
+  const tbody = document.getElementById('products-table-tbody');
+  const searchInput = document.getElementById('admin-prod-search') as HTMLInputElement;
+  const catFilter = document.getElementById('admin-cat-filter') as HTMLSelectElement;
+  const availFilter = document.getElementById('admin-avail-filter') as HTMLSelectElement;
+  const sortSelect = document.getElementById('admin-sort-select') as HTMLSelectElement;
+  const emptyState = document.getElementById('admin-table-empty');
+  const clearFilterBtn = document.getElementById('admin-clear-filter-btn');
+
+  function renderTable() {
+    const state = loadDemoState();
+    let items = [...state.products];
+
+    // Filter by search
+    const q = searchInput?.value.trim().toLowerCase() || '';
+    if (q) {
+      items = items.filter((p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.categoryName.toLowerCase().includes(q) ||
+        p.specifications.dimensions.toLowerCase().includes(q) ||
+        p.id.toLowerCase().includes(q)
+      );
+    }
+
+    // Filter by Category
+    const cat = catFilter?.value || 'all';
+    if (cat !== 'all') {
+      items = items.filter((p) => p.category === cat);
+    }
+
+    // Filter by Avail
+    const avail = availFilter?.value || 'all';
+    if (avail !== 'all') {
+      items = items.filter((p) => p.specifications.availability === avail);
+    }
+
+    // Sort
+    const sort = sortSelect?.value || 'newest';
+    if (sort === 'price-asc') {
+      items.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
+    } else if (sort === 'price-desc') {
+      items.sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price));
+    } else if (sort === 'name-asc') {
+      items.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    if (items.length === 0) {
+      if (tbody) tbody.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'block';
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+
+    if (tbody) {
+      tbody.innerHTML = items.map((p) => `
+        <tr data-row-id="${p.id}">
+          <td>
+            <img src="${p.mainImage}" alt="${p.name}" class="table-thumb" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=100&q=80'" />
+          </td>
+          <td>
+            <a href="/admin/products/${p.id}" class="table-title-link">${p.name}</a>
+            <span class="table-dim-sub">${p.specifications.dimensions}</span>
+          </td>
+          <td><span class="badge badge-category">${p.categoryName}</span></td>
+          <td><strong>$${(p.salePrice || p.price).toLocaleString()}</strong></td>
+          <td>
+            <span class="badge ${p.specifications.availability === 'In Stock' ? 'badge-stock' : 'badge-order'}">
+              ${p.specifications.availability}
+            </span>
+          </td>
+          <td><span class="mono-tag">${p.updatedAt}</span></td>
+          <td style="text-align: right;">
+            <div class="row-actions-group">
+              <a href="/admin/products/${p.id}" class="btn-action edit" title="Edit Product">Edit</a>
+              <button class="btn-action duplicate" data-dup-id="${p.id}" title="Duplicate Product">Duplicate</button>
+              <button class="btn-action delete" data-del-id="${p.id}" title="Delete Product">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      wireRowActions();
+    }
+  }
+
+  function wireRowActions() {
+    // Delete action
+    tbody?.querySelectorAll('.btn-action.delete').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.delId;
+        if (!id) return;
+        const state = loadDemoState();
+        const p = state.products.find((item) => item.id === id);
+        if (confirm(`Are you sure you want to delete "${p?.name || id}" from the inventory?`)) {
+          deleteStoredProduct(id);
+          renderTable();
+        }
+      });
+    });
+
+    // Duplicate action
+    tbody?.querySelectorAll('.btn-action.duplicate').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.dupId;
+        if (!id) return;
+        const state = loadDemoState();
+        const p = state.products.find((item) => item.id === id);
+        if (!p) return;
+
+        const newId = `prod-custom-${Date.now()}`;
+        const newSlug = `${p.slug}-copy-${Math.floor(Math.random() * 1000)}`;
+        const duplicatedProduct: Product = {
+          ...p,
+          id: newId,
+          name: `${p.name} (Copy)`,
+          slug: newSlug,
+          updatedAt: new Date().toISOString().split('T')[0]
+        };
+
+        upsertStoredProduct(duplicatedProduct);
+        alert(`Duplicated as "${duplicatedProduct.name}".`);
+        renderTable();
+      });
+    });
+  }
+
+  searchInput?.addEventListener('input', renderTable);
+  catFilter?.addEventListener('change', renderTable);
+  availFilter?.addEventListener('change', renderTable);
+  sortSelect?.addEventListener('change', renderTable);
+
+  clearFilterBtn?.addEventListener('click', () => {
+    if (searchInput) searchInput.value = '';
+    if (catFilter) catFilter.value = 'all';
+    if (availFilter) availFilter.value = 'all';
+    renderTable();
+  });
+
+  document.addEventListener('DOMContentLoaded', renderTable);
+  window.addEventListener('tc-demo-state-updated', renderTable);
+</script>

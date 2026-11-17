@@ -1,0 +1,318 @@
+---
+// src/pages/admin/categories.astro
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { CATEGORIES } from '../../data/categories';
+---
+
+<AdminLayout title="Category Taxonomies" activeNav="categories">
+  <div class="categories-admin-wrap">
+    <div class="admin-view-header">
+      <div>
+        <h2 class="view-title">Trailer Categories</h2>
+        <p class="view-sub">Manage trailer classifications, landing hero imagery, and informational buying descriptions.</p>
+      </div>
+    </div>
+
+    <!-- Category Cards Grid -->
+    <div class="categories-grid" id="admin-categories-grid">
+      {CATEGORIES.map((cat) => (
+        <div class="cat-admin-card editorial-card" data-cat-id={cat.id}>
+          <div class="cat-card-media">
+            <img src={cat.heroImage} alt={cat.name} class="cat-card-img" />
+            <span class="badge badge-stock cat-count-badge">{cat.productCount} Models</span>
+          </div>
+
+          <div class="cat-card-body">
+            <div class="cat-title-row">
+              <h3 class="cat-card-title">{cat.name}</h3>
+              <code class="cat-slug font-mono">/{cat.slug}</code>
+            </div>
+
+            <p class="cat-card-desc">{cat.shortDescription}</p>
+
+            <div class="cat-card-footer">
+              <a href={`/trailers/${cat.slug}`} target="_blank" class="cat-store-link">
+                View Page &rarr;
+              </a>
+              <button class="btn btn-secondary btn-sm cat-edit-btn" data-edit-id={cat.id}>
+                Edit Details
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div id="cat-edit-modal" class="cat-modal" aria-hidden="true" role="dialog">
+      <div class="cat-modal-dialog editorial-card">
+        <div class="cat-modal-header">
+          <h3 id="modal-cat-name" class="modal-cat-title">Edit Category</h3>
+          <button id="close-cat-modal" class="modal-close-btn">&times;</button>
+        </div>
+
+        <form id="cat-edit-form" class="cat-form">
+          <input type="hidden" id="edit-cat-id" />
+          
+          <div class="form-group">
+            <label for="edit-cat-title" class="form-label">Category Title</label>
+            <input type="text" id="edit-cat-title" class="form-input" required />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-cat-img" class="form-label">Hero Image URL</label>
+            <input type="url" id="edit-cat-img" class="form-input font-mono" required />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-cat-desc" class="form-label">Short Teaser Description</label>
+            <textarea id="edit-cat-desc" rows="3" class="form-textarea" required></textarea>
+          </div>
+
+          <div class="modal-actions-row">
+            <button type="button" id="cancel-cat-edit" class="btn btn-secondary btn-sm">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">Save Category Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<style>
+  .categories-admin-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .admin-view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .view-title {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .view-sub {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .categories-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .categories-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .cat-admin-card {
+    background-color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cat-card-media {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    background-color: var(--color-pale-sand);
+  }
+
+  .cat-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cat-count-badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .cat-card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+  }
+
+  .cat-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cat-card-title {
+    font-size: 1.15rem;
+    margin: 0;
+  }
+
+  .cat-slug {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    background-color: var(--color-pale-sand);
+    padding: 0.15rem 0.35rem;
+    border-radius: 2px;
+  }
+
+  .cat-card-desc {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .cat-card-footer {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cat-store-link {
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+
+  .cat-store-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  /* Modal */
+  .cat-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(37, 39, 36, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-fast);
+  }
+
+  .cat-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .cat-modal-dialog {
+    background-color: #FFFFFF;
+    width: 100%;
+    max-width: 500px;
+    padding: 1.75rem;
+  }
+
+  .cat-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  .modal-cat-title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .modal-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .modal-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+</style>
+
+<script>
+  import { loadDemoState, saveDemoState, type Category } from '../../utils/demo-state';
+
+  const modal = document.getElementById('cat-edit-modal');
+  const closeBtn = document.getElementById('close-cat-modal');
+  const cancelBtn = document.getElementById('cancel-cat-edit');
+  const form = document.getElementById('cat-edit-form') as HTMLFormElement;
+
+  const idInput = document.getElementById('edit-cat-id') as HTMLInputElement;
+  const titleInput = document.getElementById('edit-cat-title') as HTMLInputElement;
+  const imgInput = document.getElementById('edit-cat-img') as HTMLInputElement;
+  const descInput = document.getElementById('edit-cat-desc') as HTMLTextAreaElement;
+
+  function openEditModal(cat: Category) {
+    if (!modal) return;
+    if (idInput) idInput.value = cat.id;
+    if (titleInput) titleInput.value = cat.name;
+    if (imgInput) imgInput.value = cat.heroImage;
+    if (descInput) descInput.value = cat.shortDescription;
+
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  closeBtn?.addEventListener('click', closeModal);
+  cancelBtn?.addEventListener('click', closeModal);
+
+  document.querySelectorAll('.cat-edit-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const catId = (btn as HTMLElement).dataset.editId;
+      const state = loadDemoState();
+      const cat = state.categories.find((c) => c.id === catId);
+      if (cat) openEditModal(cat);
+    });
+  });
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = idInput.value;
+    const state = loadDemoState();
+    const cat = state.categories.find((c) => c.id === id);
+    if (cat) {
+      cat.name = titleInput.value.trim();
+      cat.heroImage = imgInput.value.trim();
+      cat.shortDescription = descInput.value.trim();
+      saveDemoState(state);
+      closeModal();
+      window.location.reload();
+    }
+  });
+</script>

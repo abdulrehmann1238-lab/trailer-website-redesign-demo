@@ -1,0 +1,158 @@
+---
+// BlogCard.astro
+import type { Article } from '../data/articles';
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+---
+<article class="blog-card editorial-card">
+  <a href={`/blog/${article.slug}`} class="blog-media-link" aria-label={`Read ${article.title}`}>
+    <div class="blog-img-wrap img-container">
+      <img
+        src={article.coverImage}
+        alt={article.title}
+        loading="lazy"
+        class="blog-img"
+        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';"
+      />
+    </div>
+  </a>
+
+  <div class="blog-body">
+    <div class="blog-meta-row">
+      <span class="badge badge-category">{article.category}</span>
+      <span class="blog-reading-time">{article.readingTime}</span>
+    </div>
+
+    <h3 class="blog-title">
+      <a href={`/blog/${article.slug}`} class="blog-title-link">
+        {article.title}
+      </a>
+    </h3>
+
+    <p class="blog-excerpt">
+      {article.excerpt}
+    </p>
+
+    <div class="blog-footer">
+      <div class="blog-author-info">
+        <span class="blog-date">{article.publishedAt}</span>
+      </div>
+      <a href={`/blog/${article.slug}`} class="blog-read-link">
+        READ ARTICLE &rarr;
+      </a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--color-pure-white);
+  }
+
+  .blog-media-link {
+    display: block;
+    width: 100%;
+  }
+
+  .blog-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+
+  .blog-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+
+  .blog-card:hover .blog-img {
+    transform: scale(1.04);
+  }
+
+  .blog-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.85rem;
+  }
+
+  .blog-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.78rem;
+  }
+
+  .blog-reading-time {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  .blog-title {
+    font-size: 1.15rem;
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  .blog-title-link {
+    color: var(--color-deep-charcoal);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .blog-title-link:hover {
+    color: var(--color-forest-green);
+  }
+
+  .blog-excerpt {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .blog-date {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .blog-read-link {
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-forest-green);
+    text-decoration: none;
+    transition: color var(--transition-fast), transform var(--transition-fast);
+    display: inline-block;
+  }
+
+  .blog-read-link:hover {
+    color: var(--color-muted-copper);
+    transform: translateX(3px);
+  }
+</style>

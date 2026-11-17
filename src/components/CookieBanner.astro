@@ -1,0 +1,129 @@
+---
+// CookieBanner.astro
+---
+<div id="cookie-banner" class="cookie-banner" aria-hidden="true" role="region" aria-label="Privacy demonstration preferences">
+  <div class="container-wide cookie-inner">
+    <div class="cookie-text-wrap">
+      <span class="cookie-badge">PRIVACY & DEMO PREFERENCES</span>
+      <p class="cookie-desc">
+        This demonstration website stores inventory and configuration edits locally in your browser (via HTML5 localStorage). No commercial ad trackers or telemetry beacons are utilized.
+      </p>
+    </div>
+    <div class="cookie-actions">
+      <button id="cookie-accept-all" class="btn btn-primary btn-sm">
+        ACCEPT ESSENTIALS
+      </button>
+      <button id="cookie-decline-all" class="btn btn-secondary btn-sm">
+        DECLINE DEMO STORAGE
+      </button>
+      <button id="cookie-customize" class="cookie-link-btn">
+        CUSTOMIZE
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--color-warm-ivory);
+    border-top: 1px solid var(--border-medium);
+    box-shadow: 0 -4px 20px rgba(37, 39, 36, 0.08);
+    z-index: 1200;
+    padding: 1rem 0;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform var(--transition-base), opacity var(--transition-base);
+  }
+
+  .cookie-banner.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .cookie-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cookie-text-wrap {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .cookie-badge {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--color-forest-green);
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .cookie-desc {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .cookie-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .cookie-link-btn {
+    background: transparent;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0.25rem;
+  }
+
+  .cookie-link-btn:hover {
+    color: var(--color-deep-charcoal);
+  }
+</style>
+
+<script>
+  const banner = document.getElementById('cookie-banner');
+  const acceptBtn = document.getElementById('cookie-accept-all');
+  const declineBtn = document.getElementById('cookie-decline-all');
+  const customBtn = document.getElementById('cookie-customize');
+
+  function initCookieBanner() {
+    const consent = localStorage.getItem('tc_cookie_consent');
+    if (!consent) {
+      setTimeout(() => {
+        banner?.classList.add('is-visible');
+        banner?.setAttribute('aria-hidden', 'false');
+      }, 1500);
+    }
+  }
+
+  function dismiss(choice: string) {
+    localStorage.setItem('tc_cookie_consent', choice);
+    banner?.classList.remove('is-visible');
+    banner?.setAttribute('aria-hidden', 'true');
+  }
+
+  acceptBtn?.addEventListener('click', () => dismiss('accepted'));
+  declineBtn?.addEventListener('click', () => dismiss('declined'));
+  customBtn?.addEventListener('click', () => {
+    alert('TRAILER COMMERCE Demo Preferences: Local Storage is enabled for CMS product and page edits. To reset demo data at any time, click "Reset to Factory Defaults" in the CMS Settings panel.');
+    dismiss('customized');
+  });
+
+  document.addEventListener('DOMContentLoaded', initCookieBanner);
+</script>

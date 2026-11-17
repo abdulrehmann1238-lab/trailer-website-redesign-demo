@@ -1,0 +1,307 @@
+---
+// QuickViewModal.astro
+---
+<div id="quickview-modal" class="quickview-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="qv-title">
+  <div class="quickview-dialog">
+    <button id="qv-close-btn" class="qv-close" aria-label="Close quick view">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="quickview-grid">
+      <!-- Media Col -->
+      <div class="qv-media-col">
+        <div class="qv-main-img-wrap">
+          <img id="qv-img" src="" alt="Trailer preview" class="qv-img" />
+          <span id="qv-badge-avail" class="badge badge-stock qv-badge">In Stock</span>
+        </div>
+      </div>
+
+      <!-- Details Col -->
+      <div class="qv-details-col">
+        <span id="qv-category" class="eyebrow eyebrow-forest">ENCLOSED TRAILER</span>
+        <h3 id="qv-title" class="qv-title">Product Name</h3>
+        
+        <div class="qv-pricing">
+          <span id="qv-price" class="qv-price-val">$0</span>
+          <span class="qv-price-label">Demo Price</span>
+        </div>
+
+        <p id="qv-description" class="qv-description">Description text...</p>
+
+        <div class="qv-specs-table">
+          <div class="qv-spec-row">
+            <span class="qv-spec-label">Dimensions:</span>
+            <span id="qv-spec-dimensions" class="qv-spec-val">-</span>
+          </div>
+          <div class="qv-spec-row">
+            <span class="qv-spec-label">Axles:</span>
+            <span id="qv-spec-axles" class="qv-spec-val">-</span>
+          </div>
+          <div class="qv-spec-row">
+            <span class="qv-spec-label">Payload Capacity:</span>
+            <span id="qv-spec-capacity" class="qv-spec-val">-</span>
+          </div>
+          <div class="qv-spec-row">
+            <span class="qv-spec-label">Frame Material:</span>
+            <span id="qv-spec-material" class="qv-spec-val">-</span>
+          </div>
+        </div>
+
+        <div class="qv-actions">
+          <button id="qv-enquire-btn" class="btn btn-primary">
+            ENQUIRE ABOUT THIS TRAILER
+          </button>
+          <a id="qv-full-link" href="#" class="btn btn-secondary">
+            FULL DETAILS &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .quickview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(37, 39, 36, 0.65);
+    backdrop-filter: blur(6px);
+    z-index: 3200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+  }
+
+  .quickview-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .quickview-dialog {
+    background-color: var(--color-warm-ivory);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-modal);
+    width: 100%;
+    max-width: 880px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding: clamp(1.5rem, 3.5vw, 2.5rem);
+    transform: translateY(20px);
+    transition: transform var(--transition-base);
+  }
+
+  .quickview-modal.is-open .quickview-dialog {
+    transform: translateY(0);
+  }
+
+  .qv-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.35rem;
+    border-radius: 50%;
+    color: var(--color-deep-charcoal);
+  }
+
+  .qv-close:hover {
+    background-color: var(--color-pale-sand);
+  }
+
+  .quickview-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .quickview-grid {
+      grid-template-columns: 1.1fr 1fr;
+    }
+  }
+
+  .qv-main-img-wrap {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-pale-sand);
+  }
+
+  .qv-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .qv-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+  }
+
+  .qv-details-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .qv-title {
+    font-size: 1.5rem;
+    margin: 0.35rem 0 0.75rem 0;
+  }
+
+  .qv-pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .qv-price-val {
+    font-family: var(--font-mono);
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--color-forest-green);
+  }
+
+  .qv-price-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .qv-description {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    color: var(--text-secondary);
+  }
+
+  .qv-specs-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 1rem;
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    margin-bottom: 1.5rem;
+  }
+
+  .qv-spec-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+  }
+
+  .qv-spec-label {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  .qv-spec-val {
+    font-weight: 600;
+    color: var(--color-deep-charcoal);
+  }
+
+  .qv-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+</style>
+
+<script>
+  import { loadDemoState, type Product } from '../utils/demo-state';
+
+  const modal = document.getElementById('quickview-modal');
+  const closeBtn = document.getElementById('qv-close-btn');
+  const imgEl = document.getElementById('qv-img') as HTMLImageElement;
+  const availEl = document.getElementById('qv-badge-avail');
+  const categoryEl = document.getElementById('qv-category');
+  const titleEl = document.getElementById('qv-title');
+  const priceEl = document.getElementById('qv-price');
+  const descEl = document.getElementById('qv-description');
+  const dimEl = document.getElementById('qv-spec-dimensions');
+  const axlesEl = document.getElementById('qv-spec-axles');
+  const capEl = document.getElementById('qv-spec-capacity');
+  const matEl = document.getElementById('qv-spec-material');
+  const fullLink = document.getElementById('qv-full-link') as HTMLAnchorElement;
+  const enquireBtn = document.getElementById('qv-enquire-btn');
+
+  let currentProduct: Product | null = null;
+
+  function openQuickView(product: Product) {
+    if (!modal) return;
+    currentProduct = product;
+
+    if (imgEl) {
+      imgEl.src = product.mainImage;
+      imgEl.alt = product.name;
+    }
+    if (availEl) availEl.textContent = product.specifications.availability;
+    if (categoryEl) categoryEl.textContent = product.categoryName.toUpperCase();
+    if (titleEl) titleEl.textContent = product.name;
+    if (priceEl) priceEl.textContent = `$${product.price.toLocaleString()}`;
+    if (descEl) descEl.textContent = product.shortDescription;
+
+    if (dimEl) dimEl.textContent = product.specifications.dimensions;
+    if (axlesEl) axlesEl.textContent = product.specifications.axles;
+    if (capEl) capEl.textContent = product.specifications.capacity;
+    if (matEl) matEl.textContent = product.specifications.material;
+
+    if (fullLink) fullLink.href = `/product/${product.slug}`;
+
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeQuickView() {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  closeBtn?.addEventListener('click', closeQuickView);
+
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeQuickView();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('is-open')) closeQuickView();
+  });
+
+  enquireBtn?.addEventListener('click', () => {
+    closeQuickView();
+    if (currentProduct) {
+      window.dispatchEvent(new CustomEvent('open-enquiry-modal', { detail: { product: currentProduct.name } }));
+    }
+  });
+
+  window.addEventListener('tc-open-quickview', ((e: CustomEvent) => {
+    const id = e.detail?.id;
+    const slug = e.detail?.slug;
+    const state = loadDemoState();
+    const product = state.products.find((p) => (id && p.id === id) || (slug && p.slug === slug));
+    if (product) openQuickView(product);
+  }) as EventListener);
+</script>

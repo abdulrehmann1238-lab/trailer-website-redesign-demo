@@ -1,0 +1,387 @@
+---
+// EnquiryModal.astro
+---
+<!-- Floating Enquiry Shortcut Button -->
+<aside aria-label="Quick Actions">
+  <button id="floating-enquiry-btn" class="floating-enquiry-btn" aria-label="Request trailer quote" title="Request a Quote">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span class="floating-text">ENQUIRE</span>
+  </button>
+</aside>
+
+<!-- Modal Overlay -->
+<div id="enquiry-modal" class="enquiry-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-dialog">
+    <button id="modal-close-btn" class="modal-close" aria-label="Close quote modal">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="modal-header">
+      <span class="eyebrow eyebrow-forest">COMMERCIAL ENQUIRY</span>
+      <h3 id="modal-title" class="modal-title">TALK TO A TRAILER SPECIALIST</h3>
+      <p class="modal-subtitle">
+        Share your cargo requirements or select a specific trailer. Our team will verify axle ratings and recommend the optimal setup.
+      </p>
+    </div>
+
+    <form id="enquiry-form" class="enquiry-form" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eq-name" class="form-label">Full Name *</label>
+          <input type="text" id="eq-name" name="name" class="form-input" placeholder="e.g. Marcus Vance" required />
+          <span class="form-error" id="err-eq-name"></span>
+        </div>
+        <div class="form-group">
+          <label for="eq-email" class="form-label">Email Address *</label>
+          <input type="email" id="eq-email" name="email" class="form-input" placeholder="name@company.com" required />
+          <span class="form-error" id="err-eq-email"></span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eq-phone" class="form-label">Phone Number *</label>
+          <input type="tel" id="eq-phone" name="phone" class="form-input" placeholder="(555) 000-0000" required />
+          <span class="form-error" id="err-eq-phone"></span>
+        </div>
+        <div class="form-group">
+          <label for="eq-product" class="form-label">Product of Interest</label>
+          <select id="eq-product" name="product" class="form-select">
+            <option value="">-- General Consultation / Custom --</option>
+            <option value="Enclosed Cargo 6×12">Enclosed Cargo 6×12 ($4,850)</option>
+            <option value="Utility Trailer 5×8">Utility Trailer 5×8 ($1,650)</option>
+            <option value="Heavy-Duty Flatbed 7×16">Heavy-Duty Flatbed 7×16 ($5,950)</option>
+            <option value="Dual Axle Cargo 7×14">Dual Axle Cargo 7×14 ($6,750)</option>
+            <option value="Compact Yard Utility 4×6">Compact Yard Utility 4×6 ($1,280)</option>
+            <option value="Landscaper Pro Utility 6.4×12">Landscaper Pro Utility 6.4×12 ($2,950)</option>
+            <option value="Pro Workman Enclosed 7×16">Pro Workman Enclosed 7×16 ($7,200)</option>
+            <option value="Apex Auto Hauler 8.5×20">Apex Auto Hauler 8.5×20 ($10,400)</option>
+            <option value="Heavy Equipment Deckover 8.5×22">Heavy Equipment Deckover 8.5×22 ($9,150)</option>
+            <option value="Aluminum Cargo Express 6×10">Aluminum Cargo Express 6×10 ($5,350)</option>
+            <option value="Equestrian Deluxe 2-Horse Slant">Equestrian Deluxe 2-Horse ($13,800)</option>
+            <option value="Thoroughbred Gooseneck 3-Horse">Thoroughbred Gooseneck 3-Horse ($21,500)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="eq-message" class="form-label">Specific Cargo or Tow Vehicle Notes</label>
+        <textarea
+          id="eq-message"
+          name="message"
+          rows="3"
+          class="form-textarea"
+          placeholder="Tell us what you plan to haul, towing vehicle model, or required options..."
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary btn-block">
+          SEND ENQUIRY & REQUEST QUOTE
+        </button>
+      </div>
+      <p class="demo-notice">
+        * Simulated frontend form. No external network request or third-party CRM submission is executed.
+      </p>
+    </form>
+
+    <!-- Success Feedback Overlay -->
+    <div id="enquiry-success" class="modal-success-state" style="display: none;">
+      <div class="success-icon-wrap">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#26372F" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h3 class="success-title">ENQUIRY RECEIVED</h3>
+      <p class="success-desc">
+        Thank you, <strong id="success-client-name">there</strong>. Your specifications have been recorded in this demo session. A representative would normally follow up within 2 business hours.
+      </p>
+      <button id="success-done-btn" class="btn btn-primary">
+        RETURN TO BROWSING
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Floating Shortcut Button */
+  .floating-enquiry-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background-color: var(--color-forest-green);
+    color: var(--color-pure-white);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    padding: 0.85rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 8px 24px rgba(38, 55, 47, 0.35);
+    cursor: pointer;
+    z-index: 800;
+    transition: transform var(--transition-base), background-color var(--transition-fast), box-shadow var(--transition-base);
+  }
+
+  .floating-enquiry-btn:hover {
+    transform: translateY(-3px);
+    background-color: var(--color-forest-green-dark);
+    box-shadow: 0 12px 30px rgba(38, 55, 47, 0.45);
+  }
+
+  .floating-text {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 640px) {
+    .floating-enquiry-btn {
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.75rem 1.1rem;
+    }
+  }
+
+  /* Modal Overlay */
+  .enquiry-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(37, 39, 36, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+  }
+
+  .enquiry-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-dialog {
+    background-color: var(--color-warm-ivory);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-modal);
+    width: 100%;
+    max-width: 620px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    position: relative;
+    transform: translateY(20px);
+    transition: transform var(--transition-base);
+  }
+
+  .enquiry-modal.is-open .modal-dialog {
+    transform: translateY(0);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: transparent;
+    border: none;
+    color: var(--color-deep-charcoal);
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition-fast);
+  }
+
+  .modal-close:hover {
+    background-color: var(--color-pale-sand);
+  }
+
+  .modal-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-title {
+    font-size: 1.45rem;
+    margin: 0.35rem 0 0.5rem 0;
+  }
+
+  .modal-subtitle {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 580px) {
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .modal-actions {
+    margin-top: 1rem;
+  }
+
+  .demo-notice {
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    text-align: center;
+  }
+
+  /* Success State */
+  .modal-success-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .success-icon-wrap {
+    width: 64px;
+    height: 64px;
+    background-color: #E8F2EC;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .success-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .success-desc {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    max-width: 440px;
+    margin-bottom: 1.75rem;
+    line-height: 1.6;
+  }
+</style>
+
+<script>
+  const modal = document.getElementById('enquiry-modal');
+  const closeBtn = document.getElementById('modal-close-btn');
+  const openBtn = document.getElementById('floating-enquiry-btn');
+  const form = document.getElementById('enquiry-form') as HTMLFormElement;
+  const successBox = document.getElementById('enquiry-success');
+  const productSelect = document.getElementById('eq-product') as HTMLSelectElement;
+  const successName = document.getElementById('success-client-name');
+  const successDoneBtn = document.getElementById('success-done-btn');
+
+  function openEnquiry(productName?: string) {
+    if (!modal) return;
+    if (productSelect && productName) {
+      // Find matching option or set value
+      for (let i = 0; i < productSelect.options.length; i++) {
+        if (productSelect.options[i].text.includes(productName) || productSelect.options[i].value === productName) {
+          productSelect.selectedIndex = i;
+          break;
+        }
+      }
+    }
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEnquiry() {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    // Reset success state after fade
+    setTimeout(() => {
+      if (form) form.style.display = 'block';
+      if (successBox) successBox.style.display = 'none';
+      if (form) form.reset();
+    }, 300);
+  }
+
+  openBtn?.addEventListener('click', () => openEnquiry());
+  closeBtn?.addEventListener('click', closeEnquiry);
+  successDoneBtn?.addEventListener('click', closeEnquiry);
+
+  // Close on backdrop click
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeEnquiry();
+  });
+
+  // Close on Escape key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('is-open')) {
+      closeEnquiry();
+    }
+  });
+
+  // Global custom event listener
+  window.addEventListener('open-enquiry-modal', ((e: CustomEvent) => {
+    openEnquiry(e.detail?.product);
+  }) as EventListener);
+
+  // Form Validation & Submission
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let isValid = true;
+
+    const nameInput = document.getElementById('eq-name') as HTMLInputElement;
+    const emailInput = document.getElementById('eq-email') as HTMLInputElement;
+    const phoneInput = document.getElementById('eq-phone') as HTMLInputElement;
+
+    const errName = document.getElementById('err-eq-name');
+    const errEmail = document.getElementById('err-eq-email');
+    const errPhone = document.getElementById('err-eq-phone');
+
+    if (errName) errName.textContent = '';
+    if (errEmail) errEmail.textContent = '';
+    if (errPhone) errPhone.textContent = '';
+
+    if (!nameInput.value.trim()) {
+      if (errName) errName.textContent = 'Please enter your name.';
+      isValid = false;
+    }
+
+    if (!emailInput.value.trim() || !emailInput.value.includes('@') || !emailInput.value.includes('.')) {
+      if (errEmail) errEmail.textContent = 'Please enter a valid email address.';
+      isValid = false;
+    }
+
+    if (!phoneInput.value.trim() || phoneInput.value.replace(/\D/g, '').length < 7) {
+      if (errPhone) errPhone.textContent = 'Please enter a contact phone number.';
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
+    // Show simulated success
+    if (successName) successName.textContent = nameInput.value.trim();
+    if (form) form.style.display = 'none';
+    if (successBox) successBox.style.display = 'flex';
+  });
+</script>
